@@ -1,0 +1,41 @@
+{
+  "capsule": "observability",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "somesh",
+      "wealthbridge"
+    ],
+    "infra": [
+      "pstn",
+      "billing",
+      "esim",
+      "sip",
+      "ran-oai",
+      "open5gs"
+    ]
+  },
+  "signals": {
+    "metrics": {
+      "format": "otlp",
+      "transport": "grpc"
+    },
+    "logs": {
+      "format": "jsonl",
+      "transport": "http"
+    },
+    "traces": {
+      "format": "otlp",
+      "transport": "grpc"
+    },
+    "health": {
+      "format": "http-json",
+      "paths": [
+        "/health",
+        "/ready",
+        "/live"
+      ]
+    }
+  }
+}

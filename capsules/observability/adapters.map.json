@@ -1,0 +1,14 @@
+{
+  "telecom": {
+    "pstn": "../../somesh/adapters/pstn",
+    "billing": "../../somesh/adapters/billing",
+    "esim": "../../somesh/adapters/esim",
+    "sip": "../../somesh/adapters/sip",
+    "ran-oai": "../../somesh/adapters/ran-oai",
+    "open5gs": "../../somesh/adapters/open5gs"
+  },
+  "runtime": {
+    "deepflex": "../../deepflex",
+    "wealthbridge": "../../wealthbridge-os"
+  }
+}
