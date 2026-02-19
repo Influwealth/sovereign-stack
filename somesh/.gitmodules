@@ -1,0 +1,24 @@
+[submodule "adapters/pstn"]
+	path = adapters/pstn
+	url = https://github.com/Influwealth/infraflow-pstn
+	branch = main
+[submodule "adapters/billing"]
+	path = adapters/billing
+	url = https://github.com/Influwealth/infraflow-billing-
+	branch = main
+[submodule "adapters/esim"]
+	path = adapters/esim
+	url = https://github.com/Influwealth/infraflow-esim
+	branch = main
+[submodule "adapters/sip"]
+	path = adapters/sip
+	url = https://github.com/Influwealth/Infraflow-voice-sip
+	branch = main
+[submodule "adapters/ran-oai"]
+	path = adapters/ran-oai
+	url = https://github.com/Influwealth/infraflow-ran-oai
+	branch = main
+[submodule "adapters/open5gs"]
+	path = adapters/open5gs
+	url = https://github.com/Influwealth/infraflow-core-open5gs
+	branch = main
