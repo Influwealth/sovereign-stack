@@ -1,0 +1,31 @@
+[
+  {
+    "name": "pricingEngine",
+    "type": "calculation",
+    "module": "capsules/economic/src/pricing-engine",
+    "capabilities": ["price_compute", "quote_generation"],
+    "boundTo": ["compute"]
+  },
+  {
+    "name": "ledgerSync",
+    "type": "accounting",
+    "module": "capsules/economic/src/ledger-sync",
+    "capabilities": ["ledger_update", "transaction_record"],
+    "boundTo": ["business-ops"]
+  },
+  {
+    "name": "fundingIntelligence",
+    "type": "grant_scoring",
+    "module": "capsules/funding-intelligence",
+    "capabilities": ["eligibility_scoring", "grant_matching"],
+    "boundTo": ["funding-intelligence"]
+  },
+  {
+    "name": "sovereignWalletBridge",
+    "type": "payout",
+    "module": "wealthbridge-os/src/wallet-bridge",
+    "capabilities": ["usdc_payout", "shopify_webhook"],
+    "boundTo": ["agent-wallet"]
+  }
+]
+

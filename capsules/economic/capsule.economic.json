@@ -1,0 +1,38 @@
+{
+  "capsule": "economic",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "sap",
+      "icp-integration"
+    ]
+  },
+  "capabilities": {
+    "pricing": [
+      "pricing.quote",
+      "pricing.reprice"
+    ],
+    "flows": [
+      "flow.authorize",
+      "flow.settle",
+      "flow.reconcile"
+    ],
+    "risk": [
+      "risk.score",
+      "risk.policy.enforce"
+    ],
+    "ledger": [
+      "ledger.entry.write",
+      "ledger.entry.query"
+    ]
+  },
+  "observability": {
+    "metrics": "economic.flows.requests",
+    "logs": "economic.audit.events",
+    "traces": "economic.settlement.path"
+  }
+}

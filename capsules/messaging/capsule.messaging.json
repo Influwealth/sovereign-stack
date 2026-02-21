@@ -1,0 +1,40 @@
+{
+  "capsule": "messaging",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "sap",
+      "icp-integration",
+      "somesh"
+    ]
+  },
+  "capabilities": {
+    "events": [
+      "event.publish",
+      "event.subscribe",
+      "event.ack"
+    ],
+    "queues": [
+      "queue.enqueue",
+      "queue.dequeue",
+      "queue.retry"
+    ],
+    "notifications": [
+      "notify.send",
+      "notify.fanout"
+    ],
+    "governance": [
+      "schema.validate",
+      "delivery.policy.enforce"
+    ]
+  },
+  "observability": {
+    "metrics": "messaging.delivery.requests",
+    "logs": "messaging.events.audit",
+    "traces": "messaging.route.dispatch"
+  }
+}

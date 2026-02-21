@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "providers": {
+    "qiskit": {
+      "status": "stubbed",
+      "backendDefault": "qiskit-aer-simulator"
+    },
+    "webgpu": {
+      "status": "stubbed",
+      "backendDefault": "webgpu-simulator"
+    },
+    "cudaq": {
+      "status": "stubbed",
+      "backendDefault": "cudaq-simulator"
+    },
+    "simulator": {
+      "status": "active",
+      "backendDefault": "cpu-simulator"
+    }
+  },
+  "modules": {
+    "circuitBuilder": "src/circuit-builder.ts",
+    "executionWrapper": "src/execution-wrapper.ts",
+    "resultNormalizer": "src/result-normalizer.ts",
+    "quantumFlowPlaceholder": "src/quantumflow-placeholder.ts"
+  }
+}

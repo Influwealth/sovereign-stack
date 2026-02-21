@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "economic.pricing.quote",
+      "path": "/economic/pricing/quote",
+      "method": "POST",
+      "handler": "economic.pricing.quote",
+      "auth": "required"
+    },
+    {
+      "id": "economic.flow.authorize",
+      "path": "/economic/flows/authorize",
+      "method": "POST",
+      "handler": "economic.flow.authorize",
+      "auth": "required"
+    },
+    {
+      "id": "economic.flow.settle",
+      "path": "/economic/flows/settle",
+      "method": "POST",
+      "handler": "economic.flow.settle",
+      "auth": "required"
+    },
+    {
+      "id": "economic.flow.reconcile",
+      "path": "/economic/flows/reconcile",
+      "method": "POST",
+      "handler": "economic.flow.reconcile",
+      "auth": "required"
+    },
+    {
+      "id": "economic.ledger.query",
+      "path": "/economic/ledger/query",
+      "method": "POST",
+      "handler": "economic.ledger.query",
+      "auth": "required"
+    }
+  ]
+}

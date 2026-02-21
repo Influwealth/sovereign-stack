@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "adapters": [
+    {
+      "name": "billing",
+      "path": "./adapters/billing",
+      "enabled": true
+    },
+    {
+      "name": "esim",
+      "path": "./adapters/esim",
+      "enabled": true
+    },
+    {
+      "name": "open5gs",
+      "path": "./adapters/open5gs",
+      "enabled": true
+    },
+    {
+      "name": "pstn",
+      "path": "./adapters/pstn",
+      "enabled": true
+    },
+    {
+      "name": "ran-oai",
+      "path": "./adapters/ran-oai",
+      "enabled": true
+    },
+    {
+      "name": "sip",
+      "path": "./adapters/sip",
+      "enabled": true
+    }
+  ]
+}

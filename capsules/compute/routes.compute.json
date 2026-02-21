@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "compute.job.submit",
+      "path": "/compute/jobs/submit",
+      "method": "POST",
+      "handler": "compute.job.submit",
+      "auth": "required"
+    },
+    {
+      "id": "compute.job.status",
+      "path": "/compute/jobs/status",
+      "method": "POST",
+      "handler": "compute.job.status",
+      "auth": "required"
+    },
+    {
+      "id": "compute.job.cancel",
+      "path": "/compute/jobs/cancel",
+      "method": "POST",
+      "handler": "compute.job.cancel",
+      "auth": "required"
+    },
+    {
+      "id": "compute.schedule.dispatch",
+      "path": "/compute/schedule/dispatch",
+      "method": "POST",
+      "handler": "compute.schedule.dispatch",
+      "auth": "required"
+    },
+    {
+      "id": "compute.execution.route",
+      "path": "/compute/execution/route",
+      "method": "POST",
+      "handler": "compute.execution.route",
+      "auth": "required"
+    }
+  ]
+}

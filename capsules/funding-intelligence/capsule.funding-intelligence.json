@@ -1,0 +1,38 @@
+{
+  "capsule": "funding-intelligence",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "economic",
+      "compliance",
+      "business-ops"
+    ]
+  },
+  "capabilities": {
+    "intake": [
+      "funding.intake.capture",
+      "funding.intake.normalize"
+    ],
+    "analysis": [
+      "funding.score.evaluate",
+      "funding.forecast.model"
+    ],
+    "allocation": [
+      "funding.allocation.recommend",
+      "funding.allocation.adjust"
+    ],
+    "governance": [
+      "funding.policy.enforce",
+      "funding.audit.log"
+    ]
+  },
+  "observability": {
+    "metrics": "funding_intelligence.analysis.requests",
+    "logs": "funding_intelligence.audit.events",
+    "traces": "funding_intelligence.recommendation.path"
+  }
+}

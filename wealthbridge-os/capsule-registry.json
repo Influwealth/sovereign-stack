@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-02-19",
+  "capsules": [
+    {
+      "name": "identity",
+      "status": "live",
+      "path": "../capsules/identity",
+      "manifest": "capsule.identity.json",
+      "routes": "routes.identity.json",
+      "adapters": "adapters.map.json"
+    },
+    {
+      "name": "messaging",
+      "status": "live",
+      "path": "../capsules/messaging",
+      "manifest": "capsule.messaging.json",
+      "routes": "routes.messaging.json",
+      "adapters": "adapters.map.json"
+    },
+    {
+      "name": "compute",
+      "status": "live",
+      "path": "../capsules/compute",
+      "manifest": "capsule.compute.json",
+      "routes": "routes.compute.json",
+      "adapters": "adapters.map.json"
+    },
+    {
+      "name": "economic",
+      "status": "live",
+      "path": "../capsules/economic",
+      "manifest": "capsule.economic.json",
+      "routes": "routes.economic.json",
+      "adapters": "adapters.map.json"
+    },
+    {
+      "name": "social",
+      "status": "live",
+      "path": "../capsules/social",
+      "manifest": "capsule.social.json",
+      "routes": "routes.social.json",
+      "adapters": "adapters.map.json"
+    }
+  ]
+}

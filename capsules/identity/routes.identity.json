@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "identity.did.issue",
+      "path": "/identity/did/issue",
+      "method": "POST",
+      "handler": "identity.did.issue",
+      "auth": "required"
+    },
+    {
+      "id": "identity.did.resolve",
+      "path": "/identity/did/resolve",
+      "method": "POST",
+      "handler": "identity.did.resolve",
+      "auth": "required"
+    },
+    {
+      "id": "identity.token.issue",
+      "path": "/identity/token/issue",
+      "method": "POST",
+      "handler": "identity.token.issue",
+      "auth": "required"
+    },
+    {
+      "id": "identity.token.verify",
+      "path": "/identity/token/verify",
+      "method": "POST",
+      "handler": "identity.token.verify",
+      "auth": "required"
+    },
+    {
+      "id": "identity.authorization.check",
+      "path": "/identity/authorize",
+      "method": "POST",
+      "handler": "identity.authorization.check",
+      "auth": "required"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "runtime": {
+    "deepflex": "../../deepflex",
+    "wealthbridge": "../../wealthbridge-os"
+  },
+  "integration": {
+    "messaging": "../messaging",
+    "compute": "../compute",
+    "economic": "../economic"
+  },
+  "observability": {
+    "capsule": "../observability"
+  }
+}

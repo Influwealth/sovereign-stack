@@ -1,0 +1,41 @@
+{
+  "capsule": "compute",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "quantum-adapter",
+      "sap",
+      "icp-integration"
+    ]
+  },
+  "capabilities": {
+    "jobs": [
+      "job.submit",
+      "job.cancel",
+      "job.status"
+    ],
+    "scheduling": [
+      "schedule.enqueue",
+      "schedule.dispatch",
+      "schedule.retry"
+    ],
+    "execution": [
+      "workload.route",
+      "execution.start",
+      "execution.stop"
+    ],
+    "governance": [
+      "resource.policy.enforce",
+      "execution.audit.log"
+    ]
+  },
+  "observability": {
+    "metrics": "compute.jobs.requests",
+    "logs": "compute.execution.audit",
+    "traces": "compute.scheduler.dispatch"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "capsule": "compliance",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "identity",
+      "economic",
+      "business-ops"
+    ]
+  },
+  "capabilities": {
+    "policy": [
+      "compliance.policy.evaluate",
+      "compliance.policy.version"
+    ],
+    "controls": [
+      "compliance.control.validate",
+      "compliance.control.attest"
+    ],
+    "violations": [
+      "compliance.violation.detect",
+      "compliance.violation.remediate"
+    ],
+    "reporting": [
+      "compliance.evidence.export",
+      "compliance.report.generate"
+    ]
+  },
+  "observability": {
+    "metrics": "compliance.checks.requests",
+    "logs": "compliance.audit.events",
+    "traces": "compliance.evaluation.path"
+  }
+}

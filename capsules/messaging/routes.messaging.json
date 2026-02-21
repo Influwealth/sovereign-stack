@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "messaging.event.publish",
+      "path": "/messaging/events/publish",
+      "method": "POST",
+      "handler": "messaging.event.publish",
+      "auth": "required"
+    },
+    {
+      "id": "messaging.event.subscribe",
+      "path": "/messaging/events/subscribe",
+      "method": "POST",
+      "handler": "messaging.event.subscribe",
+      "auth": "required"
+    },
+    {
+      "id": "messaging.queue.enqueue",
+      "path": "/messaging/queue/enqueue",
+      "method": "POST",
+      "handler": "messaging.queue.enqueue",
+      "auth": "required"
+    },
+    {
+      "id": "messaging.queue.dequeue",
+      "path": "/messaging/queue/dequeue",
+      "method": "POST",
+      "handler": "messaging.queue.dequeue",
+      "auth": "required"
+    },
+    {
+      "id": "messaging.notify.send",
+      "path": "/messaging/notify/send",
+      "method": "POST",
+      "handler": "messaging.notify.send",
+      "auth": "required"
+    }
+  ]
+}

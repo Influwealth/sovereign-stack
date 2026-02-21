@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "social.profile.create",
+      "path": "/social/profile/create",
+      "method": "POST",
+      "handler": "social.profile.create",
+      "auth": "required"
+    },
+    {
+      "id": "social.graph.link.create",
+      "path": "/social/graph/link/create",
+      "method": "POST",
+      "handler": "social.graph.link.create",
+      "auth": "required"
+    },
+    {
+      "id": "social.engagement.record",
+      "path": "/social/engagement/record",
+      "method": "POST",
+      "handler": "social.engagement.record",
+      "auth": "required"
+    },
+    {
+      "id": "social.engagement.score",
+      "path": "/social/engagement/score",
+      "method": "POST",
+      "handler": "social.engagement.score",
+      "auth": "required"
+    },
+    {
+      "id": "social.moderation.check",
+      "path": "/social/moderation/check",
+      "method": "POST",
+      "handler": "social.moderation.check",
+      "auth": "required"
+    }
+  ]
+}

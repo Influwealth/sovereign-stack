@@ -1,0 +1,13 @@
+{
+  "runtime": {
+    "deepflex": "../../deepflex",
+    "wealthbridge": "../../wealthbridge-os"
+  },
+  "integration": {
+    "messaging": "../messaging",
+    "sap": "../../sap"
+  },
+  "observability": {
+    "capsule": "../observability"
+  }
+}

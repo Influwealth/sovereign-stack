@@ -1,0 +1,41 @@
+{
+  "capsule": "identity",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "trust": [
+      "infra-federated-access",
+      "sap",
+      "icp-integration"
+    ]
+  },
+  "capabilities": {
+    "identity": [
+      "did.issue",
+      "did.resolve",
+      "did.rotate"
+    ],
+    "auth": [
+      "token.issue",
+      "token.verify",
+      "session.validate"
+    ],
+    "policy": [
+      "capability.check",
+      "node.admission.check",
+      "execution.authorize"
+    ],
+    "audit": [
+      "audit.log.write",
+      "audit.log.query"
+    ]
+  },
+  "observability": {
+    "metrics": "identity.auth.requests",
+    "logs": "identity.audit.events",
+    "traces": "identity.authorization.path"
+  }
+}

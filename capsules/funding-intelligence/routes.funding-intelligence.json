@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "funding-intelligence.intake.capture",
+      "path": "/funding-intelligence/intake/capture",
+      "method": "POST",
+      "handler": "funding-intelligence.intake.capture",
+      "auth": "required"
+    },
+    {
+      "id": "funding-intelligence.score.evaluate",
+      "path": "/funding-intelligence/score/evaluate",
+      "method": "POST",
+      "handler": "funding-intelligence.score.evaluate",
+      "auth": "required"
+    },
+    {
+      "id": "funding-intelligence.forecast.model",
+      "path": "/funding-intelligence/forecast/model",
+      "method": "POST",
+      "handler": "funding-intelligence.forecast.model",
+      "auth": "required"
+    },
+    {
+      "id": "funding-intelligence.allocation.recommend",
+      "path": "/funding-intelligence/allocation/recommend",
+      "method": "POST",
+      "handler": "funding-intelligence.allocation.recommend",
+      "auth": "required"
+    },
+    {
+      "id": "funding-intelligence.allocation.adjust",
+      "path": "/funding-intelligence/allocation/adjust",
+      "method": "POST",
+      "handler": "funding-intelligence.allocation.adjust",
+      "auth": "required"
+    }
+  ]
+}

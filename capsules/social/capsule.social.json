@@ -1,0 +1,39 @@
+{
+  "capsule": "social",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "messaging",
+      "sap"
+    ]
+  },
+  "capabilities": {
+    "profiles": [
+      "profile.create",
+      "profile.update",
+      "profile.resolve"
+    ],
+    "graph": [
+      "graph.link.create",
+      "graph.link.remove",
+      "graph.query"
+    ],
+    "engagement": [
+      "engagement.record",
+      "engagement.score"
+    ],
+    "moderation": [
+      "moderation.policy.check",
+      "moderation.action.apply"
+    ]
+  },
+  "observability": {
+    "metrics": "social.engagement.requests",
+    "logs": "social.audit.events",
+    "traces": "social.interaction.path"
+  }
+}

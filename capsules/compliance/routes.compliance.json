@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "compliance.policy.evaluate",
+      "path": "/compliance/policy/evaluate",
+      "method": "POST",
+      "handler": "compliance.policy.evaluate",
+      "auth": "required"
+    },
+    {
+      "id": "compliance.control.validate",
+      "path": "/compliance/control/validate",
+      "method": "POST",
+      "handler": "compliance.control.validate",
+      "auth": "required"
+    },
+    {
+      "id": "compliance.control.attest",
+      "path": "/compliance/control/attest",
+      "method": "POST",
+      "handler": "compliance.control.attest",
+      "auth": "required"
+    },
+    {
+      "id": "compliance.violation.detect",
+      "path": "/compliance/violation/detect",
+      "method": "POST",
+      "handler": "compliance.violation.detect",
+      "auth": "required"
+    },
+    {
+      "id": "compliance.report.generate",
+      "path": "/compliance/report/generate",
+      "method": "POST",
+      "handler": "compliance.report.generate",
+      "auth": "required"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "capsule": "business-ops",
+  "version": "0.1.0",
+  "domains": {
+    "runtime": [
+      "deepflex",
+      "wealthbridge"
+    ],
+    "integration": [
+      "messaging",
+      "compute",
+      "economic"
+    ]
+  },
+  "capabilities": {
+    "operations": [
+      "ops.workflow.start",
+      "ops.workflow.step",
+      "ops.workflow.complete"
+    ],
+    "coordination": [
+      "ops.escalate",
+      "ops.handoff",
+      "ops.sync"
+    ],
+    "signals": [
+      "kpi.record",
+      "kpi.evaluate"
+    ],
+    "governance": [
+      "ops.policy.enforce",
+      "ops.audit.log"
+    ]
+  },
+  "observability": {
+    "metrics": "business_ops.workflows.requests",
+    "logs": "business_ops.audit.events",
+    "traces": "business_ops.execution.path"
+  }
+}

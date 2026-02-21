@@ -1,0 +1,84 @@
+import fs from "fs";
+import path from "path";
+import type { AgentIdentity, WalletBinding } from "./agent.types";
+
+/**
+ * AgentRuntime
+ * ------------
+ * Loads and manages:
+ *   - agent registry
+ *   - wallet bindings
+ *   - capability profiles
+ *   - permissions envelopes
+ *
+ * This is the "state layer" for the Agent Federation.
+ */
+
+export class AgentRuntime {
+  private registryPath: string;
+  private registry: {
+    agents: AgentIdentity[];
+    wallets: WalletBinding[];
+  };
+
+  constructor() {
+    this.registryPath = path.join(__dirname, "agent-registry.json");
+    this.registry = this.loadRegistry();
+  }
+
+  // ---------------------------------------------------------
+  // Registry Loader
+  // ---------------------------------------------------------
+  private loadRegistry() {
+    try {
+      const raw = fs.readFileSync(this.registryPath, "utf8");
+      const parsed = JSON.parse(raw);
+
+      return {
+        agents: parsed.agents || [],
+        wallets: parsed.wallets || []
+      };
+    } catch (err) {
+      console.error("[agent-runtime] Failed to load agent-registry.json", err);
+      return { agents: [], wallets: [] };
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Agent Accessors
+  // ---------------------------------------------------------
+  getAgent(agentId: string): AgentIdentity | undefined {
+    return this.registry.agents.find((a) => a.id === agentId);
+  }
+
+  listAgents(): AgentIdentity[] {
+    return this.registry.agents;
+  }
+
+  // ---------------------------------------------------------
+  // Wallet Binding Accessors
+  // ---------------------------------------------------------
+  getWalletBinding(walletId: string): WalletBinding {
+    const binding = this.registry.wallets.find((w) => w.walletId === walletId);
+
+    if (!binding) {
+      throw new Error(
+        `[agent-runtime] Wallet binding not found for walletId: ${walletId}`
+      );
+    }
+
+    return binding;
+  }
+
+  listWalletBindings(): WalletBinding[] {
+    return this.registry.wallets;
+  }
+
+  // ---------------------------------------------------------
+  // Registry Refresh (if updated externally)
+  // ---------------------------------------------------------
+  reload() {
+    this.registry = this.loadRegistry();
+  }
+}
+

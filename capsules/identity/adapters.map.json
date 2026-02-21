@@ -1,0 +1,14 @@
+{
+  "trust": {
+    "infra-federated-access": "../../infra-federated-access",
+    "sap": "../../sap",
+    "icp-integration": "../../icp-integration"
+  },
+  "runtime": {
+    "deepflex": "../../deepflex",
+    "wealthbridge": "../../wealthbridge-os"
+  },
+  "observability": {
+    "capsule": "../observability"
+  }
+}

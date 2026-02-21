@@ -1,0 +1,39 @@
+{
+  "routes": [
+    {
+      "id": "business-ops.workflow.start",
+      "path": "/business-ops/workflow/start",
+      "method": "POST",
+      "handler": "business-ops.workflow.start",
+      "auth": "required"
+    },
+    {
+      "id": "business-ops.workflow.step",
+      "path": "/business-ops/workflow/step",
+      "method": "POST",
+      "handler": "business-ops.workflow.step",
+      "auth": "required"
+    },
+    {
+      "id": "business-ops.workflow.complete",
+      "path": "/business-ops/workflow/complete",
+      "method": "POST",
+      "handler": "business-ops.workflow.complete",
+      "auth": "required"
+    },
+    {
+      "id": "business-ops.escalate",
+      "path": "/business-ops/escalate",
+      "method": "POST",
+      "handler": "business-ops.escalate",
+      "auth": "required"
+    },
+    {
+      "id": "business-ops.kpi.evaluate",
+      "path": "/business-ops/kpi/evaluate",
+      "method": "POST",
+      "handler": "business-ops.kpi.evaluate",
+      "auth": "required"
+    }
+  ]
+}
