@@ -10,7 +10,7 @@ if (!apiKey) {
 const client = axios.create({
   baseURL,
   headers: {
-    Authorization: Bearer ,
+    Authorization: `Bearer ${process.env.CIRCLE_API_KEY || ""}``
     "Content-Type": "application/json"
   }
 });
@@ -31,3 +31,4 @@ export async function createPayout(usdcAmount: string, destinationWalletId: stri
   const res = await client.post("/payouts", body);
   return res.data;
 }
+
