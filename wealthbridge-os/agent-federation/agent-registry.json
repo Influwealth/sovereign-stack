@@ -60,15 +60,13 @@
       ]
     }
   ],
-  "wallets": [
+  "walletBindings": [
     {
+      "agentId": "agent_001",
       "walletId": "wallet_001",
       "network": "circle-mainnet",
       "address": "0x0000000000000000000000000000000000000001",
-      "metadata": {
-        "owner": "agent_001",
-        "type": "primary"
-      }
+      "type": "primary"
     }
   ]
 }
