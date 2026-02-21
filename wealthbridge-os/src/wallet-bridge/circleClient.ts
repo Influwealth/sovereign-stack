@@ -10,7 +10,7 @@ if (!apiKey) {
 const client = axios.create({
   baseURL,
   headers: {
-    Authorization: `Bearer ${process.env.CIRCLE_API_KEY || ""}``
+    Authorization: `Bearer ${process.env.CIRCLE_API_KEY || ""}`,
     "Content-Type": "application/json"
   }
 });
