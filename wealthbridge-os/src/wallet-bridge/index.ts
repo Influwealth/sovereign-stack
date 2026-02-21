@@ -11,7 +11,7 @@ export async function triggerPayoutFromShopify(rawBody: string, hmacHeader?: str
 // Generic agent-level payout hook (used by agent-wallet.ts)
 export async function triggerPayout(agentId: string, amount: number, currency: string) {
   const order = {
-    orderId: gent--,
+    orderId: `order_${Date.now()}`,
     customerId: agentId,
     totalPrice: String(amount),
     currency
