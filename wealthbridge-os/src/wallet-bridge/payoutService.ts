@@ -9,7 +9,7 @@ export interface NormalizedOrder {
 }
 
 export async function handleOrderPayout(order: NormalizedOrder) {
-  const userId = order.userId;
+  const userId = order.userId ?? order.customer?.id ?? "unknown";
   const walletId = resolveWalletIdForUser(userId);
 
   if (!walletId) {
