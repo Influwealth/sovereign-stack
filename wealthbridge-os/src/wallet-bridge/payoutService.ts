@@ -9,7 +9,7 @@ export interface NormalizedOrder {
 }
 
 export async function handleOrderPayout(order: NormalizedOrder) {
-  const userId = wealthbridgeUser_;
+  const userId = order.userId;
   const walletId = resolveWalletIdForUser(userId);
 
   if (!walletId) {
