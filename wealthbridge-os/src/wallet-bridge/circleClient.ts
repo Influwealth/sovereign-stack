@@ -1,34 +1,43 @@
-﻿import axios from "axios";
+import axios from "axios";
 
-const baseURL = process.env.CIRCLE_BASE_URL || "https://api.circle.com/v1";
-const apiKey = process.env.CIRCLE_API_KEY || "";
-
-if (!apiKey) {
-  console.warn("[wallet-bridge] CIRCLE_API_KEY is not set. Payouts will fail until configured.");
+export interface PayoutResult {
+  id?: string;
+  status?: string;
+  raw?: any;
 }
 
-const client = axios.create({
-  baseURL,
-  headers: {
-    Authorization: `Bearer ${process.env.CIRCLE_API_KEY || ""}`,
-    "Content-Type": "application/json"
-  }
-});
+export async function createPayout(
+  walletId: string,
+  amountInDollars: number,
+  currency = "USD",
+  idempotencyKey?: string
+): Promise<PayoutResult> {
+  const apiKey = process.env.CIRCLE_API_KEY || "";
+  const baseUrl = "https://api.circle.com/v1";
+  const amountStr = Number(amountInDollars || 0).toFixed(2);
 
-export async function createPayout(usdcAmount: string, destinationWalletId: string, referenceId: string) {
   const body = {
-    idempotencyKey: referenceId,
-    amount: {
-      amount: usdcAmount,
-      currency: "USD"
-    },
-    destination: {
-      type: "wallet",
-      id: destinationWalletId
-    }
+    idempotencyKey: idempotencyKey || `payout_${Date.now()}`,
+    amount: { amount: amountStr, currency },
+    destination: { type: "wallet", id: walletId }
   };
 
-  const res = await client.post("/payouts", body);
-  return res.data;
-}
+  console.log("[circleClient] Using API key prefix:", apiKey.split(":")[0] || "(none)");
+  console.log("[circleClient] Payout payload:", JSON.stringify(body));
 
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${apiKey}`
+  };
+
+  try {
+    const resp = await axios.post(`${baseUrl}/payouts`, body, { headers });
+    console.log("[circleClient] Response status:", resp.status, "data:", resp.data);
+    return { id: resp.data?.id, status: "ok", raw: resp.data };
+  } catch (err: any) {
+    const status = err?.response?.status;
+    const data = err?.response?.data;
+    console.error("[circleClient] Error status:", status, "data:", JSON.stringify(data));
+    throw new Error(`Circle payout failed: status=${status} message=${JSON.stringify(data)}`);
+  }
+}
