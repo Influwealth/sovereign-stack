@@ -1,84 +1,83 @@
-import fs from "fs";
-import path from "path";
-import type { AgentIdentity, WalletBinding } from "./agent.types";
-
-/**
- * AgentRuntime
- * ------------
- * Loads and manages:
- *   - agent registry
- *   - wallet bindings
- *   - capability profiles
- *   - permissions envelopes
- *
- * This is the "state layer" for the Agent Federation.
- */
-
-export class AgentRuntime {
-  private registryPath: string;
-  private registry: {
-    agents: AgentIdentity[];
-    wallets: WalletBinding[];
-  };
-
-  constructor() {
-    this.registryPath = path.join(__dirname, "agent-registry.json");
-    this.registry = this.loadRegistry();
-  }
-
-  // ---------------------------------------------------------
-  // Registry Loader
-  // ---------------------------------------------------------
-  private loadRegistry() {
-    try {
-      const raw = fs.readFileSync(this.registryPath, "utf8");
-      const parsed = JSON.parse(raw);
-
-      return {
-        agents: parsed.agents || [],
-        wallets: parsed.wallets || []
-      };
-    } catch (err) {
-      console.error("[agent-runtime] Failed to load agent-registry.json", err);
-      return { agents: [], wallets: [] };
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-02-24",
+  "capsules": [
+    {
+      "name": "identity",
+      "category": "core",
+      "status": "live",
+      "path": "../capsules/identity",
+      "manifest": "capsule.identity.json",
+      "description": "Identity, authentication, token formats, IFA integration."
+    },
+    {
+      "name": "messaging",
+      "category": "core",
+      "status": "live",
+      "path": "../capsules/messaging",
+      "manifest": "capsule.messaging.json",
+      "description": "Inter-capsule messaging, event bus, notifications."
+    },
+    {
+      "name": "compute",
+      "category": "core",
+      "status": "live",
+      "path": "../capsules/compute",
+      "manifest": "capsule.compute.json",
+      "description": "Local compute orchestration, scheduling, workload routing."
+    },
+    {
+      "name": "economic",
+      "category": "core",
+      "status": "live",
+      "path": "../capsules/economic",
+      "manifest": "capsule.economic.json",
+      "description": "Financial logic, pricing, settlement, reconciliation."
+    },
+    {
+      "name": "social",
+      "category": "core",
+      "status": "live",
+      "path": "../capsules/social",
+      "manifest": "capsule.social.json",
+      "description": "Social graph, engagement logic, interaction flows."
+    },
+    {
+      "name": "business-ops",
+      "category": "business",
+      "status": "live",
+      "path": "../capsules/business-ops",
+      "manifest": "capsule.business-ops.json",
+      "description": "Operational workflows, KPI handling, escalation routing."
+    },
+    {
+      "name": "compliance",
+      "category": "governance",
+      "status": "live",
+      "path": "../capsules/compliance",
+      "manifest": "capsule.compliance.json",
+      "description": "Policy checks, controls, violations, reporting."
+    },
+    {
+      "name": "funding-intelligence",
+      "category": "business",
+      "status": "live",
+      "path": "../capsules/funding-intelligence",
+      "manifest": "capsule.funding-intelligence.json",
+      "description": "Funding analysis, scoring, allocation recommendations."
+    },
+    {
+      "name": "tax",
+      "path": "capsules/wealthbridge-tax-stack",
+      "version": "1.0.0",
+      "entry": "app/main.py",
+      "manifest": "app/main.py",
+      "agents": [
+        "tax.calculate",
+        "tax.generate_1120",
+        "tax.generate_1065",
+        "tax.generate_941"
+      ]
     }
-  }
-
-  // ---------------------------------------------------------
-  // Agent Accessors
-  // ---------------------------------------------------------
-  getAgent(agentId: string): AgentIdentity | undefined {
-    return this.registry.agents.find((a) => a.id === agentId);
-  }
-
-  listAgents(): AgentIdentity[] {
-    return this.registry.agents;
-  }
-
-  // ---------------------------------------------------------
-  // Wallet Binding Accessors
-  // ---------------------------------------------------------
-  getWalletBinding(walletId: string): WalletBinding {
-    const binding = this.registry.wallets.find((w) => w.walletId === walletId);
-
-    if (!binding) {
-      throw new Error(
-        `[agent-runtime] Wallet binding not found for walletId: ${walletId}`
-      );
-    }
-
-    return binding;
-  }
-
-  listWalletBindings(): WalletBinding[] {
-    return this.registry.wallets;
-  }
-
-  // ---------------------------------------------------------
-  // Registry Refresh (if updated externally)
-  // ---------------------------------------------------------
-  reload() {
-    this.registry = this.loadRegistry();
-  }
+  ]
 }
-

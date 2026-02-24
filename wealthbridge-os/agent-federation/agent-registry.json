@@ -38,6 +38,94 @@
         ]
       },
       "status": "active"
+    },
+    {
+      "id": "tax.calculate",
+      "did": "did:wb:tax-calc",
+      "role": "standard",
+      "walletId": "wallet-tax",
+      "allowedCapsules": [
+        "tax"
+      ],
+      "capabilities": [
+        "capsule:tax",
+        "tax.calculate"
+      ],
+      "permissions": {
+        "capsules": [
+          "tax"
+        ],
+        "routes": [
+          "tax.calculate"
+        ]
+      },
+      "status": "active"
+    },
+    {
+      "id": "tax.generate_1120",
+      "did": "did:wb:tax-1120",
+      "role": "standard",
+      "walletId": "wallet-tax",
+      "allowedCapsules": [
+        "tax"
+      ],
+      "capabilities": [
+        "capsule:tax",
+        "tax.generate_1120"
+      ],
+      "permissions": {
+        "capsules": [
+          "tax"
+        ],
+        "routes": [
+          "tax.generate_1120"
+        ]
+      },
+      "status": "active"
+    },
+    {
+      "id": "tax.generate_1065",
+      "did": "did:wb:tax-1065",
+      "role": "standard",
+      "walletId": "wallet-tax",
+      "allowedCapsules": [
+        "tax"
+      ],
+      "capabilities": [
+        "capsule:tax",
+        "tax.generate_1065"
+      ],
+      "permissions": {
+        "capsules": [
+          "tax"
+        ],
+        "routes": [
+          "tax.generate_1065"
+        ]
+      },
+      "status": "active"
+    },
+    {
+      "id": "tax.generate_941",
+      "did": "did:wb:tax-941",
+      "role": "standard",
+      "walletId": "wallet-tax",
+      "allowedCapsules": [
+        "tax"
+      ],
+      "capabilities": [
+        "capsule:tax",
+        "tax.generate_941"
+      ],
+      "permissions": {
+        "capsules": [
+          "tax"
+        ],
+        "routes": [
+          "tax.generate_941"
+        ]
+      },
+      "status": "active"
     }
   ],
   "capabilityProfiles": [
@@ -67,6 +155,34 @@
       "network": "circle-mainnet",
       "address": "0x0000000000000000000000000000000000000001",
       "type": "primary"
+    },
+    {
+      "agentId": "tax.calculate",
+      "walletId": "wallet-tax",
+      "network": "circle-mainnet",
+      "address": "0x00000000000000000000000000000000000000TA",
+      "type": "tax-shared"
+    },
+    {
+      "agentId": "tax.generate_1120",
+      "walletId": "wallet-tax",
+      "network": "circle-mainnet",
+      "address": "0x00000000000000000000000000000000000000TA",
+      "type": "tax-shared"
+    },
+    {
+      "agentId": "tax.generate_1065",
+      "walletId": "wallet-tax",
+      "network": "circle-mainnet",
+      "address": "0x00000000000000000000000000000000000000TA",
+      "type": "tax-shared"
+    },
+    {
+      "agentId": "tax.generate_941",
+      "walletId": "wallet-tax",
+      "network": "circle-mainnet",
+      "address": "0x00000000000000000000000000000000000000TA",
+      "type": "tax-shared"
     }
   ]
 }

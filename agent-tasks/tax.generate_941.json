@@ -1,0 +1,13 @@
+{
+  "agentId": "tax.generate_941",
+  "capsule": "tax",
+  "route": "tax.generate_941",
+  "entry": "app/main.py",
+  "task": "Generate IRS Form 941 employment tax filing outputs.",
+  "payloadSchema": {
+    "quarter": "string",
+    "payrollLedger": "object",
+    "withholdings": "object"
+  },
+  "status": "ready"
+}

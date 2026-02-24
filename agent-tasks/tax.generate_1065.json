@@ -1,0 +1,13 @@
+{
+  "agentId": "tax.generate_1065",
+  "capsule": "tax",
+  "route": "tax.generate_1065",
+  "entry": "app/main.py",
+  "task": "Generate IRS Form 1065 partnership filing outputs.",
+  "payloadSchema": {
+    "taxYear": "number",
+    "partnershipProfile": "object",
+    "ledger": "object"
+  },
+  "status": "ready"
+}

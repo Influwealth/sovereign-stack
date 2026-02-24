@@ -1,0 +1,13 @@
+{
+  "agentId": "tax.generate_1120",
+  "capsule": "tax",
+  "route": "tax.generate_1120",
+  "entry": "app/main.py",
+  "task": "Generate IRS Form 1120 package outputs.",
+  "payloadSchema": {
+    "taxYear": "number",
+    "corpProfile": "object",
+    "ledger": "object"
+  },
+  "status": "ready"
+}

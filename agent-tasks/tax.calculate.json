@@ -1,0 +1,13 @@
+{
+  "agentId": "tax.calculate",
+  "capsule": "tax",
+  "route": "tax.calculate",
+  "entry": "app/main.py",
+  "task": "Calculate tax liabilities and return structured results.",
+  "payloadSchema": {
+    "taxYear": "number",
+    "entityType": "string",
+    "documents": "array"
+  },
+  "status": "ready"
+}
