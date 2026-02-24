@@ -1,4 +1,4 @@
-{
+﻿{
   "agents": [
     {
       "id": "agent_001",
@@ -44,20 +44,11 @@
       "did": "did:wb:tax-calc",
       "role": "standard",
       "walletId": "wallet-tax",
-      "allowedCapsules": [
-        "tax"
-      ],
-      "capabilities": [
-        "capsule:tax",
-        "tax.calculate"
-      ],
+      "allowedCapsules": ["tax"],
+      "capabilities": ["capsule:tax", "tax.calculate"],
       "permissions": {
-        "capsules": [
-          "tax"
-        ],
-        "routes": [
-          "tax.calculate"
-        ]
+        "capsules": ["tax"],
+        "routes": ["tax.calculate"]
       },
       "status": "active"
     },
@@ -66,20 +57,11 @@
       "did": "did:wb:tax-1120",
       "role": "standard",
       "walletId": "wallet-tax",
-      "allowedCapsules": [
-        "tax"
-      ],
-      "capabilities": [
-        "capsule:tax",
-        "tax.generate_1120"
-      ],
+      "allowedCapsules": ["tax"],
+      "capabilities": ["capsule:tax", "tax.generate_1120"],
       "permissions": {
-        "capsules": [
-          "tax"
-        ],
-        "routes": [
-          "tax.generate_1120"
-        ]
+        "capsules": ["tax"],
+        "routes": ["tax.generate_1120"]
       },
       "status": "active"
     },
@@ -88,20 +70,11 @@
       "did": "did:wb:tax-1065",
       "role": "standard",
       "walletId": "wallet-tax",
-      "allowedCapsules": [
-        "tax"
-      ],
-      "capabilities": [
-        "capsule:tax",
-        "tax.generate_1065"
-      ],
+      "allowedCapsules": ["tax"],
+      "capabilities": ["capsule:tax", "tax.generate_1065"],
       "permissions": {
-        "capsules": [
-          "tax"
-        ],
-        "routes": [
-          "tax.generate_1065"
-        ]
+        "capsules": ["tax"],
+        "routes": ["tax.generate_1065"]
       },
       "status": "active"
     },
@@ -110,20 +83,11 @@
       "did": "did:wb:tax-941",
       "role": "standard",
       "walletId": "wallet-tax",
-      "allowedCapsules": [
-        "tax"
-      ],
-      "capabilities": [
-        "capsule:tax",
-        "tax.generate_941"
-      ],
+      "allowedCapsules": ["tax"],
+      "capabilities": ["capsule:tax", "tax.generate_941"],
       "permissions": {
-        "capsules": [
-          "tax"
-        ],
-        "routes": [
-          "tax.generate_941"
-        ]
+        "capsules": ["tax"],
+        "routes": ["tax.generate_941"]
       },
       "status": "active"
     }

@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "1.0.0",
   "updatedAt": "2026-02-24",
   "capsules": [
@@ -35,28 +35,11 @@
       "description": "Financial logic, pricing, settlement, reconciliation."
     },
     {
-      "name": "social",
-      "category": "core",
-      "status": "live",
-      "path": "../capsules/social",
-      "manifest": "capsule.social.json",
-      "description": "Social graph, engagement logic, interaction flows."
-    },
-    {
       "name": "business-ops",
-      "category": "business",
-      "status": "live",
-      "path": "../capsules/business-ops",
-      "manifest": "capsule.business-ops.json",
-      "description": "Operational workflows, KPI handling, escalation routing."
-    },
-    {
-      "name": "compliance",
       "category": "governance",
       "status": "live",
-      "path": "../capsules/compliance",
-      "manifest": "capsule.compliance.json",
-      "description": "Policy checks, controls, violations, reporting."
+      "path": "../capsules/business-ops",
+      "manifest": "capsule.business-ops.json"
     },
     {
       "name": "funding-intelligence",
