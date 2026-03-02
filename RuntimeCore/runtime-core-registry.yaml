@@ -1,0 +1,103 @@
+metadata:
+  name: Runtime Core
+  version: "1.0.0"
+  updated_on: "2026-03-02"
+  owner: "Sovereign Runtime Council"
+  purpose: "Unified control and data contracts across sovereign workspaces."
+
+runtime_core:
+  operating_model:
+    topology: "federated"
+    consistency: "eventual with policy-verified checkpoints"
+    trust_boundary: "workspace-level isolation with mesh-mediated exchange"
+  global_interfaces:
+    control_plane:
+      - runtime.health.v1
+      - runtime.policy.decisions.v1
+      - runtime.incidents.v1
+    data_plane:
+      - sovereign.events.v1
+      - sovereign.ledger.postings.v1
+      - sovereign.audit.trail.v1
+
+components:
+  - id: argus
+    name: Argus
+    registration_status: registered
+    class: runtime-security
+    workspace: "C:\\Users\\VICTOR MORALES\\workspace\\_workspaces\\ARGUS"
+    responsibilities:
+      - "Threat detection and anomaly scoring."
+      - "Autonomous containment recommendations."
+      - "Runtime trust-state publishing."
+    exposed_interfaces:
+      - argus.threat.signals.v1
+      - argus.response.actions.v1
+      - argus.attestation.v1
+    consumes_interfaces:
+      - runtime.health.v1
+      - sovereign.audit.trail.v1
+
+  - id: wealthbridge-os
+    name: WealthBridge OS
+    registration_status: registered
+    class: financial-orchestration
+    workspace: "C:\\Users\\VICTOR MORALES\\workspace\\_workspaces\\WealthBridgeOS"
+    responsibilities:
+      - "Financial workflow orchestration."
+      - "Tax rules execution and filing orchestration."
+      - "Settlement and treasury synchronization."
+    exposed_interfaces:
+      - wealthbridge.accounts.v1
+      - wealthbridge.tax.events.v1
+      - wealthbridge.settlement.v1
+    consumes_interfaces:
+      - sovereign.ledger.postings.v1
+      - sovereign.events.v1
+
+  - id: synapz
+    name: Synapz
+    registration_status: registered
+    class: agent-operations
+    workspace: "C:\\Users\\VICTOR MORALES\\workspace\\_workspaces\\Synapz"
+    responsibilities:
+      - "Agent lifecycle and capsule deployment."
+      - "Task routing and runtime memory exchange."
+      - "Cross-domain coordination workflows."
+    exposed_interfaces:
+      - synapz.agents.lifecycle.v1
+      - synapz.tasks.router.v1
+      - synapz.capsules.registry.v1
+    consumes_interfaces:
+      - runtime.policy.decisions.v1
+      - sovereign.events.v1
+
+  - id: mesh-layer
+    name: Mesh Layer
+    registration_status: registered
+    class: network-governance-fabric
+    workspaces:
+      - "C:\\Users\\VICTOR MORALES\\workspace\\_workspaces\\MeshStorage"
+      - "C:\\Users\\VICTOR MORALES\\workspace\\_workspaces\\SOMESH"
+      - "C:\\Users\\VICTOR MORALES\\workspace\\_workspaces\\SovereignStack"
+    responsibilities:
+      - "Secure service discovery and routing."
+      - "Identity federation and service attestation."
+      - "State replication and data locality controls."
+    exposed_interfaces:
+      - mesh.discovery.v1
+      - mesh.identity.v1
+      - mesh.replication.v1
+    consumes_interfaces:
+      - argus.attestation.v1
+      - runtime.incidents.v1
+
+governance:
+  policy_requirements:
+    - "All cross-workspace calls require identity attestations."
+    - "All tax-impacting events must be immutable and replayable."
+    - "All mobility operations must emit lineage metadata."
+  release_gates:
+    - "Contract tests pass for all exposed interfaces."
+    - "Incident rollback plan published."
+    - "Audit trail retention policy validated."

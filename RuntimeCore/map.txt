@@ -1,0 +1,15 @@
+=== WORKSPACE: RuntimeCore ===
+
+Folders:
+ - ARGUS -> C:\Users\VICTOR MORALES\workspace\_workspaces\ARGUS
+ - WealthBridgeOS -> C:\Users\VICTOR MORALES\workspace\_workspaces\WealthBridgeOS
+ - Synapz -> C:\Users\VICTOR MORALES\workspace\_workspaces\Synapz
+ - MeshStorage -> C:\Users\VICTOR MORALES\workspace\_workspaces\MeshStorage
+ - SOMESH -> C:\Users\VICTOR MORALES\workspace\_workspaces\SOMESH
+ - SovereignStack -> C:\Users\VICTOR MORALES\workspace\_workspaces\SovereignStack
+
+Artifacts:
+ - runtime-core-registry.yaml
+ - sovereign-launch-architecture.md
+ - taxes-automation-workflows.md
+ - workspace-mobility-workflows.md
