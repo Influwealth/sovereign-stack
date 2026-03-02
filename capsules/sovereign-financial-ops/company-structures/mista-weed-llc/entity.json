@@ -1,0 +1,17 @@
+{
+  "entity": "Mista-Weed LLC",
+  "type": "Limited Liability Company",
+  "state": "CONFIRM",
+  "status": "Active",
+  "ein": "PENDING-CONFIRM",
+  "primary_activity": "Cannabis-adjacent services, content, consulting",
+  "tax_treatment": "Pass-through | Separate entity — do NOT commingle with InfluWealth",
+  "note": "IRC 280E may apply to cannabis-touching activities. Structure carefully.",
+  "deductions": [
+    "Ordinary business expenses (non-280E restricted)",
+    "COGS if applicable",
+    "Marketing",
+    "Equipment"
+  ],
+  "strategy": "Keep revenue streams separate. Consider IRS compliance review before filing."
+}

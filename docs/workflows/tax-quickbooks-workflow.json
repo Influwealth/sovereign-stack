@@ -1,0 +1,43 @@
+{
+  "workflow_id": "tax.quickbooks.sync.v1",
+  "description": "Post tax outcomes into QuickBooks with idempotent journal mapping.",
+  "trigger_event": "tax.workflow.completed",
+  "steps": [
+    {
+      "id": "map_accounts",
+      "subsystem": "quickbooks-connector",
+      "mappings": {
+        "tax_due": "Taxes Payable",
+        "estimated_payments": "Tax Expense",
+        "refund_expected": "Tax Receivable"
+      }
+    },
+    {
+      "id": "build_journal_entry",
+      "subsystem": "quickbooks-connector",
+      "required_references": [
+        "message_id",
+        "reservation_id"
+      ]
+    },
+    {
+      "id": "post_entry",
+      "subsystem": "quickbooks-connector",
+      "retry_policy": {
+        "max_attempts": 5,
+        "backoff_ms": 2000
+      }
+    },
+    {
+      "id": "emit_result",
+      "subsystem": "event-bus",
+      "success_event": "quickbooks.sync.completed",
+      "failure_event": "quickbooks.sync.failed"
+    }
+  ],
+  "failure_conditions": [
+    "quickbooks_auth_failed",
+    "schema_mapping_invalid",
+    "duplicate_external_id"
+  ]
+}

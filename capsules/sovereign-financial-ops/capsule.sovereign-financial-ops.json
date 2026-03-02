@@ -1,0 +1,45 @@
+{
+  "name": "sovereign-financial-ops",
+  "version": "1.0.0",
+  "classification": "SOVEREIGN | CONFIDENTIAL | AGENT-ACCESSIBLE",
+  "owner": "Victor Morales | InfluWealth Consult LLC",
+  "created": "2026-03-01",
+  "position": "one-level-below-codex",
+  "parent": "sovereign-stack/capsules/",
+  "entry": "workflows/orchestrator.py",
+  "description": "Sovereign financial operations capsule. Handles tax filing automation (2022-2025), company structure management, DAO/trust tree, agent-assisted IRS form generation, Manager.io sync, and OpenWispr relay.",
+  "companies": [
+    "InfluWealth Consult LLC",
+    "Mista-Weed LLC"
+  ],
+  "tax_years": ["2022-amendment", "2023-amendment", "2024-return", "2025-return"],
+  "agents": [
+    "sovereign-financial-ops.tax.calculate",
+    "sovereign-financial-ops.tax.amend_2022",
+    "sovereign-financial-ops.tax.amend_2023",
+    "sovereign-financial-ops.tax.file_2024",
+    "sovereign-financial-ops.tax.file_2025",
+    "sovereign-financial-ops.manager_io.sync",
+    "sovereign-financial-ops.agoda.ingest",
+    "sovereign-financial-ops.argus.monitor",
+    "sovereign-financial-ops.federal_api.query",
+    "sovereign-financial-ops.dao.propose",
+    "sovereign-financial-ops.trust.manage"
+  ],
+  "integrations": {
+    "openwhispr": "../openwhispr",
+    "federal_api_vault": "../../federal-api-vault",
+    "manager_io": "cloud-or-local",
+    "agoda_agent": "agents/agoda-agent",
+    "argus": "agents/argus-agent",
+    "mcp_ui": "../../mcp-ui",
+    "wealthbridge_tax_stack": "../wealthbridge-tax-stack"
+  },
+  "access_policy": {
+    "codex": "read-write",
+    "deepflex": "read-write",
+    "outside_agents": "read-execute",
+    "mcp_ui": "read-execute",
+    "public": "none"
+  }
+}

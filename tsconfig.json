@@ -9,5 +9,5 @@
     "resolveJsonModule": true,
     "strict": false
   },
-  "include": ["wealthbridge-os/**/*", "capsules/**/*"]
+  "include": ["wealthbridge-os/**/*", "capsules/**/*", "deepflex/**/*"]
 }

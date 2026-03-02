@@ -1,0 +1,19 @@
+{
+  "bridge": "openwhispr-sovereign-financial-ops",
+  "relay_path": "../../openwhispr",
+  "handlers": [
+    "tax.calculate",
+    "tax.amend",
+    "tax.file",
+    "manager_io.sync",
+    "manager_io.pull",
+    "agoda.ingest",
+    "argus.monitor",
+    "federal_api.irs_query",
+    "federal_api.sam_query",
+    "dao.propose",
+    "trust.report"
+  ],
+  "auth": "SAP-DID",
+  "status": "PENDING-WIRE"
+}

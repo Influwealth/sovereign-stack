@@ -1,0 +1,50 @@
+{
+  "workflow_id": "tax.financial_intent.envelope.v1",
+  "description": "Tax task dispatch with SAP + FinancialIntent pre-authorization.",
+  "steps": [
+    {
+      "id": "validate_sap",
+      "subsystem": "runtime-core",
+      "intent": "validate_sap",
+      "required_fields": [
+        "sap_version",
+        "message_id",
+        "from",
+        "to",
+        "capability_id",
+        "intent",
+        "signature"
+      ]
+    },
+    {
+      "id": "verify_identity",
+      "subsystem": "identity",
+      "intent": "identity.verify_signature"
+    },
+    {
+      "id": "reserve_budget",
+      "subsystem": "financial-intent",
+      "intent": "financial_intent.evaluate",
+      "rules": [
+        "estimated_cost <= max_spend",
+        "budget >= estimated_cost"
+      ]
+    },
+    {
+      "id": "dispatch_tax_task",
+      "subsystem": "capsule-runtime",
+      "intent": "execute_capsule"
+    },
+    {
+      "id": "settle",
+      "subsystem": "financial-intent",
+      "intent": "financial_intent.settle"
+    }
+  ],
+  "failure_conditions": [
+    "signature_invalid",
+    "identity_untrusted",
+    "financial_intent_denied",
+    "route_not_registered"
+  ]
+}

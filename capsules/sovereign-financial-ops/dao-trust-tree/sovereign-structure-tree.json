@@ -1,0 +1,78 @@
+{
+  "sovereign_structure_tree": {
+    "root": "Victor Morales (Natural Person)",
+    "tier_1_holding": {
+      "name": "InfluWealth Sovereign Trust (SUGGESTED)",
+      "type": "Irrevocable Asset Protection Trust",
+      "purpose": "Hold IP, software assets, WealthBridge OS ownership above LLC level",
+      "assets": ["WealthBridge OS IP", "SAP Protocol", "DeepFlex codebase", "Domain portfolio"],
+      "benefit": "Separates personal liability. IP held in trust, licensed DOWN to LLCs."
+    },
+    "tier_2_operating": [
+      {
+        "name": "InfluWealth Consult LLC",
+        "type": "Operating LLC (NY)",
+        "role": "AI consulting, education, WealthBridge services",
+        "tax_election": "S-Corp (evaluate at $80k+ net profit)",
+        "branches": [
+          "WealthBridge OS licensing division",
+          "Online education (courses, bootcamps)",
+          "AI consulting (enterprise clients)",
+          "Federal grant applications (NSF SBIR)"
+        ]
+      },
+      {
+        "name": "Mista-Weed LLC",
+        "type": "Operating LLC",
+        "role": "Cannabis-adjacent services",
+        "note": "Keep fully separate. Evaluate 280E exposure."
+      }
+    ],
+    "tier_3_dao": {
+      "name": "WealthBridge DAO (SUGGESTED — Phase 2)",
+      "type": "Decentralized Autonomous Organization",
+      "chain": "ICP (Internet Computer) — aligns with your existing ICP integration",
+      "purpose": "Community governance of WealthBridge protocol. Token holders vote on SAP upgrades.",
+      "token": "WB Token (governance + utility)",
+      "phases": [
+        "Phase 1: DAO constitution + governance rules",
+        "Phase 2: Deploy on ICP canister",
+        "Phase 3: Token distribution to early contributors + clients",
+        "Phase 4: DAO treasury funds future R&D"
+      ]
+    },
+    "tier_4_life_insurance": {
+      "strategy": "Infinite Banking / LIRP",
+      "recommended_product": "Whole Life or Indexed Universal Life (IUL)",
+      "purpose": [
+        "Tax-free death benefit to heirs",
+        "Living benefit: policy loans at low interest (fund business without bank)",
+        "Cash value grows tax-deferred",
+        "Fund courses, equipment, R&D from policy loans"
+      ],
+      "action": "Get quotes from MassMutual, Northwestern Mutual, or North American Company for IUL"
+    },
+    "tier_5_branches_suggested": [
+      {
+        "name": "InfluWealth Real Estate LLC (SUGGESTED)",
+        "purpose": "Hold real estate assets. Courses on AI for real estate. Rental intelligence.",
+        "aligns_with": "Zillow + Zumper + Edmund Homes connectors"
+      },
+      {
+        "name": "InfraFlow Telecom LLC or DBA (SUGGESTED)",
+        "purpose": "Commercialize InfraFlow PSTN/eSIM/5G stack. Sell telecom automation.",
+        "aligns_with": "InfraFlow repos already built"
+      },
+      {
+        "name": "Synapz Media LLC (SUGGESTED)",
+        "purpose": "Content automation, social media management, AI-generated content.",
+        "aligns_with": "Synapz + SynapzContent repos"
+      },
+      {
+        "name": "WealthBridge Capital (FUTURE)",
+        "purpose": "Investment vehicle. Raise capital from sovereign community.",
+        "aligns_with": "WealthBridge OS economic capsule + DAO treasury"
+      }
+    ]
+  }
+}

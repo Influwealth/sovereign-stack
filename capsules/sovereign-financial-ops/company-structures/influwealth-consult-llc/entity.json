@@ -1,0 +1,27 @@
+{
+  "entity": "InfluWealth Consult LLC",
+  "type": "Limited Liability Company",
+  "state": "New York",
+  "status": "Active",
+  "ein": "PENDING-CONFIRM",
+  "primary_activity": "AI consulting, sovereign automation, financial education, WealthBridge OS",
+  "naics_codes": ["541511", "611430", "523930"],
+  "tax_treatment": "S-Corp election eligible | Default pass-through",
+  "rd_eligible": true,
+  "years_active": ["2022", "2023", "2024", "2025"],
+  "deductions": [
+    "Software development (WealthBridge OS, DeepFlex)",
+    "AI API subscriptions (Anthropic, OpenAI, Google)",
+    "Cloud infrastructure (IONOS, AWS, ICP)",
+    "Home office (dedicated workspace)",
+    "Equipment (Spectre laptop, EliteBook, S23)",
+    "Professional development",
+    "Marketing and advertising"
+  ],
+  "rd_credits": {
+    "2022": "AMEND - capture R&D begin",
+    "2023": "AMEND - InfluWealth platform R&D",
+    "2024": "FILE - WealthBridge OS architecture R&D",
+    "2025": "FILE - DeepFlex, capsule system, agent framework R&D"
+  }
+}

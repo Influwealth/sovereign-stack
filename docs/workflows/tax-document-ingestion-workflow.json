@@ -1,0 +1,48 @@
+{
+  "workflow_id": "tax.document.ingestion.v1",
+  "description": "Ingest and normalize tax source documents into structured records.",
+  "accepted_inputs": [
+    "pdf",
+    "csv",
+    "json"
+  ],
+  "steps": [
+    {
+      "id": "checksum_validate",
+      "subsystem": "document-ingestion",
+      "rule": "source_checksum must match payload bytes"
+    },
+    {
+      "id": "extract",
+      "subsystem": "document-ingestion",
+      "processors": [
+        "ocr",
+        "table_parser",
+        "key_value_extractor"
+      ]
+    },
+    {
+      "id": "normalize",
+      "subsystem": "document-ingestion",
+      "required_fields": [
+        "document_type",
+        "tax_year",
+        "entity_id",
+        "amounts",
+        "counterparty",
+        "source_checksum",
+        "confidence_score"
+      ]
+    },
+    {
+      "id": "publish",
+      "subsystem": "event-bus",
+      "event": "tax.document.parsed"
+    }
+  ],
+  "failure_conditions": [
+    "checksum_mismatch",
+    "missing_required_fields",
+    "confidence_below_threshold"
+  ]
+}

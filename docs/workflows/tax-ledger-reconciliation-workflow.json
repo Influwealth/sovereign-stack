@@ -1,0 +1,46 @@
+{
+  "workflow_id": "tax.ledger.reconciliation.v1",
+  "description": "Reconcile tax outputs against settlement and accounting ledgers.",
+  "inputs": [
+    "tax_agent_outputs",
+    "financial_intent_settlements",
+    "quickbooks_journals",
+    "economic_ledger_entries"
+  ],
+  "steps": [
+    {
+      "id": "build_keys",
+      "subsystem": "ledger-reconciliation",
+      "key_format": "entity_id + tax_year + period + message_id"
+    },
+    {
+      "id": "match_records",
+      "subsystem": "ledger-reconciliation",
+      "rules": [
+        "all ledgers must contain matching message_id",
+        "currencies must match"
+      ]
+    },
+    {
+      "id": "compute_variance",
+      "subsystem": "ledger-reconciliation",
+      "thresholds": {
+        "usd_amount_delta": 0.01
+      }
+    },
+    {
+      "id": "emit_status",
+      "subsystem": "event-bus",
+      "events": [
+        "ledger.reconcile.reconciled",
+        "ledger.reconcile.variance_detected",
+        "ledger.reconcile.missing_record"
+      ]
+    }
+  ],
+  "failure_conditions": [
+    "amount_variance_exceeded",
+    "currency_mismatch",
+    "missing_counterparty_record"
+  ]
+}
