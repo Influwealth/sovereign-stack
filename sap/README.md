@@ -5,3 +5,6 @@
 **Files**
 - SAP-v1.0-spec.md
 - examples/
+
+**Current custom intent**
+- `RDSignupIntent` (WealthBridge R&D sign-up flow via DeepFlex Runtime Core)

@@ -5,11 +5,21 @@ import type { AgentIdentity } from "./agent.types";
 
 import { CapsuleStore } from "../capsule-store";
 import { loadCapsuleArtifacts } from "../runtime-loader";
+import { appendArgusAuditRecord } from "../integrations/argus-audit-store";
+import { handleRDSignup } from "../capsules/rd-signup-capsule";
+import type { RDSignupInput, RDSignupResult } from "../capsules/rd-signup-types";
 import {
+  ARGUS_AUDIT_CAPABILITY_ID,
+  ARGUS_AUDIT_INTENT,
+  RD_SIGNUP_CAPABILITY_ID,
+  RD_SIGNUP_INTENT,
+  RD_SIGNUP_TARGET_SUBSYSTEM,
   CapsuleSandbox,
   DeepFlexRuntimeCore,
+  createRDSignupFinancialIntentStub,
   createIdentitySubsystem,
   type FinancialIntent,
+  type RuntimeEvent,
   type RuntimeSubsystem,
   type SAPMessage
 } from "../../deepflex";
@@ -26,6 +36,19 @@ interface PayoutPayload {
   agentId: string;
   amount: number;
   currency: string;
+}
+
+interface RDSignupAuditPayload {
+  auditSource: "argus-audit-bridge";
+  eventType: string;
+  correlationId?: string;
+  messageId: string;
+  from?: string;
+  to?: string;
+  intent: string;
+  capabilityId?: string;
+  status: "received" | "completed" | "failed";
+  payload: unknown;
 }
 
 // ---------------------------------------------------------
@@ -65,6 +88,9 @@ export class AgentOrchestrator {
       capabilities: agent.capabilities,
       callCapsule: async (capsuleName: string, route: string, payload: any) => {
         return await this.executeCapsule(agent, capsuleName, route, payload);
+      },
+      rdSignup: async (input: RDSignupInput) => {
+        return await this.executeRDSignupIntent(agent, input);
       },
       payout: async (amount: number, currency: string) => {
         return await this.executePayout(agent, amount, currency);
@@ -143,6 +169,27 @@ export class AgentOrchestrator {
     return dispatch.result;
   }
 
+  async executeRDSignupIntent(agent: AgentIdentity, input: RDSignupInput): Promise<RDSignupResult> {
+    if (!this.agentHasCapability(agent, RD_SIGNUP_CAPABILITY_ID)) {
+      throw new Error(
+        `Policy violation: Agent ${agent.id} lacks required capability '${RD_SIGNUP_CAPABILITY_ID}'.`
+      );
+    }
+
+    const financialIntent = createRDSignupFinancialIntentStub(agent.id);
+    const message = this.buildSAPMessage<RDSignupInput>(
+      agent,
+      RD_SIGNUP_TARGET_SUBSYSTEM,
+      RD_SIGNUP_CAPABILITY_ID,
+      RD_SIGNUP_INTENT,
+      input,
+      financialIntent
+    );
+
+    const dispatch = await this.runtimeCore.dispatch(message);
+    return dispatch.result as RDSignupResult;
+  }
+
   private buildSAPMessage<TPayload>(
     agent: AgentIdentity,
     to: string,
@@ -201,6 +248,33 @@ export class AgentOrchestrator {
     });
   }
 
+  private agentHasCapability(agent: AgentIdentity, requestedCapability: string): boolean {
+    return (agent.capabilities || []).some((grant) => this.matchesCapabilityGrant(grant, requestedCapability));
+  }
+
+  private matchesCapabilityGrant(grant: string, requestedCapability: string): boolean {
+    const normalizedGrant = String(grant || "").trim();
+    if (!normalizedGrant) {
+      return false;
+    }
+
+    if (normalizedGrant === "*" || normalizedGrant === requestedCapability) {
+      return true;
+    }
+
+    if (normalizedGrant.endsWith(".*")) {
+      const prefix = normalizedGrant.slice(0, -2);
+      return requestedCapability.startsWith(`${prefix}.`);
+    }
+
+    if (normalizedGrant.startsWith("capsule:")) {
+      const capsuleName = normalizedGrant.slice("capsule:".length);
+      return requestedCapability.startsWith(`${capsuleName}.`);
+    }
+
+    return false;
+  }
+
   private createRuntimeCore(): DeepFlexRuntimeCore {
     const runtimeCore = new DeepFlexRuntimeCore();
 
@@ -225,6 +299,17 @@ export class AgentOrchestrator {
             };
           }
 
+          if (runtimeCore.hasSubsystem(subsystemId)) {
+            const subsystem = runtimeCore.listSubsystems().find((entry) => entry.subsystemId === subsystemId);
+            if (subsystem) {
+              return {
+                subsystemId: subsystem.subsystemId,
+                did: subsystem.did,
+                status: "active"
+              };
+            }
+          }
+
           try {
             const agent = this.runtime.getAgent(subsystemId);
             return {
@@ -241,6 +326,11 @@ export class AgentOrchestrator {
 
     runtimeCore.registerSubsystem(this.createCapsuleRuntimeSubsystem());
     runtimeCore.registerSubsystem(this.createFinancialIntentSubsystem());
+    runtimeCore.registerSubsystem(this.createRDSignupIntentSubsystem());
+    runtimeCore.registerSubsystem(this.createArgusAuditSubsystem());
+    runtimeCore.registerSubsystem(this.createRDAuditBridgeSubsystem());
+
+    this.bindRDSignupAuditBridge(runtimeCore);
 
     return runtimeCore;
   }
@@ -327,6 +417,136 @@ export class AgentOrchestrator {
         };
       }
     };
+  }
+
+  private createRDSignupIntentSubsystem(): RuntimeSubsystem {
+    return {
+      identity: {
+        subsystemId: RD_SIGNUP_TARGET_SUBSYSTEM,
+        did: "did:deepflex:rd-signup-intent",
+        capabilities: [RD_SIGNUP_CAPABILITY_ID]
+      },
+      accepts: [RD_SIGNUP_INTENT],
+      handle: async (message) => {
+        const payload = (message.payload ?? {}) as RDSignupInput;
+        return await handleRDSignup(payload);
+      }
+    };
+  }
+
+  private createArgusAuditSubsystem(): RuntimeSubsystem {
+    return {
+      identity: {
+        subsystemId: "argus-audit",
+        did: "did:argus:audit",
+        capabilities: [ARGUS_AUDIT_CAPABILITY_ID]
+      },
+      accepts: [ARGUS_AUDIT_INTENT],
+      handle: async (message) => {
+        const payload = (message.payload ?? {}) as RDSignupAuditPayload;
+        const status =
+          payload.status === "received" || payload.status === "completed" || payload.status === "failed"
+            ? payload.status
+            : "recorded";
+        const record = appendArgusAuditRecord({
+          messageId: payload.messageId || message.message_id,
+          eventType: payload.eventType || "sap.dispatch.recorded",
+          correlationId: payload.correlationId || message.message_id,
+          from: payload.from || message.from,
+          to: payload.to || message.to,
+          intent: payload.intent || RD_SIGNUP_INTENT,
+          capabilityId: payload.capabilityId || message.capability_id,
+          status,
+          payload: payload.payload ?? payload
+        });
+
+        return {
+          ok: true,
+          subsystem: "argus-audit",
+          recordId: record.id,
+          recordedAt: record.ts
+        };
+      }
+    };
+  }
+
+  private createRDAuditBridgeSubsystem(): RuntimeSubsystem {
+    return {
+      identity: {
+        subsystemId: "rd-signup-audit-bridge",
+        did: "did:deepflex:rd-signup-audit-bridge",
+        capabilities: [ARGUS_AUDIT_CAPABILITY_ID]
+      },
+      accepts: [],
+      handle: async () => {
+        throw new Error("rd-signup-audit-bridge does not accept direct intents.");
+      }
+    };
+  }
+
+  private bindRDSignupAuditBridge(runtimeCore: DeepFlexRuntimeCore): void {
+    runtimeCore.getEventBus().subscribe("*", (event) => {
+      if (!this.isRDSignupEvent(event)) {
+        return;
+      }
+
+      const payload = (event.payload ?? {}) as Record<string, unknown>;
+      const auditStatus = this.resolveAuditStatus(event.type);
+      const auditPayload: RDSignupAuditPayload = {
+        auditSource: "argus-audit-bridge",
+        eventType: event.type,
+        correlationId: event.correlation_id,
+        messageId: String(payload.message_id || event.correlation_id || event.id),
+        from: typeof payload.from === "string" ? payload.from : undefined,
+        to: typeof payload.to === "string" ? payload.to : undefined,
+        intent: RD_SIGNUP_INTENT,
+        capabilityId: typeof payload.capability_id === "string" ? payload.capability_id : undefined,
+        status: auditStatus,
+        payload
+      };
+
+      const messageId = runtimeCore.createMessageId("argus-audit");
+      const unsignedEnvelope: Omit<SAPMessage<RDSignupAuditPayload>, "signature"> = {
+        sap_version: "1.0",
+        message_id: messageId,
+        from: "rd-signup-audit-bridge",
+        to: "argus-audit",
+        capability_id: ARGUS_AUDIT_CAPABILITY_ID,
+        intent: ARGUS_AUDIT_INTENT,
+        payload: auditPayload,
+        financial_intent: createRDSignupFinancialIntentStub("rd-signup-audit-bridge")
+      };
+
+      const signed: SAPMessage<RDSignupAuditPayload> = {
+        ...unsignedEnvelope,
+        signature: runtimeCore.signMessage("rd-signup-audit-bridge", unsignedEnvelope)
+      };
+
+      void runtimeCore.dispatch(signed).catch(() => {
+        // Argus audit failures should not break primary intent execution.
+      });
+    });
+  }
+
+  private isRDSignupEvent(event: RuntimeEvent): boolean {
+    if (!event.type.startsWith("sap.dispatch.")) {
+      return false;
+    }
+    if (!event.payload || typeof event.payload !== "object") {
+      return false;
+    }
+    const payload = event.payload as Record<string, unknown>;
+    return payload.intent === RD_SIGNUP_INTENT;
+  }
+
+  private resolveAuditStatus(eventType: string): RDSignupAuditPayload["status"] {
+    if (eventType === "sap.dispatch.failed") {
+      return "failed";
+    }
+    if (eventType === "sap.dispatch.completed") {
+      return "completed";
+    }
+    return "received";
   }
 }
 

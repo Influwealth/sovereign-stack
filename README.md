@@ -14,3 +14,13 @@ This monorepo contains:
 - **SoMesh Telecom Layer** — telecom adapters (billing, eSIM, PSTN, SIP, RAN‑OAI)
 - **SAP + ICP Integrations** — enterprise + decentralized compute
 - **OpenWhispr + MCP‑UI** — human interface + agent control panel
+
+## R&D Sign-Up Capsule (WealthBridge Integrated)
+- SAP intent: `RDSignupIntent`
+- Capsule handler: `wealthbridge-os/capsules/rd-signup-capsule.ts`
+- Runtime dispatch: DeepFlex Runtime Core (`rd-signup-intent` subsystem)
+- Audit visibility: Argus audit subsystem receives all `RDSignupIntent` lifecycle events
+- Outputs:
+  - R&D activity logs in `docs/tax/rd-logs` and `data/tax/rd-logs`
+  - Draft R&D tax package in `docs/tax/rd-packages` and `data/tax/rd-packages`
+  - WealthBridge member and tax capsule records in `wealthbridge-os/data/rd-signup-records.json`

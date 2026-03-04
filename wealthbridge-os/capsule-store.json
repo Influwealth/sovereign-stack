@@ -50,6 +50,14 @@
       "description": "Funding analysis, scoring, allocation recommendations."
     },
     {
+      "name": "rd-signup",
+      "category": "business",
+      "status": "live",
+      "path": "capsules/rd-signup",
+      "manifest": "index.ts",
+      "description": "WealthBridge-integrated R&D sign-up capsule for eligibility, tax package drafting, and benefits routing."
+    },
+    {
       "name": "tax",
       "path": "capsules/wealthbridge-tax-stack",
       "version": "1.0.0",

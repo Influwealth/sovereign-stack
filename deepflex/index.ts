@@ -53,3 +53,12 @@ export {
   type IdentityRecord,
   type IdentitySubsystemOptions
 } from "./identity-subsystem";
+
+export {
+  ARGUS_AUDIT_CAPABILITY_ID,
+  ARGUS_AUDIT_INTENT,
+  RD_SIGNUP_CAPABILITY_ID,
+  RD_SIGNUP_INTENT,
+  RD_SIGNUP_TARGET_SUBSYSTEM,
+  createRDSignupFinancialIntentStub
+} from "./rd-signup-intent";

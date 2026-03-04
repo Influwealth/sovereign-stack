@@ -16,6 +16,7 @@
         "capsule:somesh-telecom",
         "economic.triggerPayout",
         "economic.ledgerUpdate",
+        "rd.signup.process",
         "identity.resolve",
         "messaging.send"
       ],
@@ -33,6 +34,7 @@
         "routes": [
           "economic.triggerPayout",
           "economic.ledgerUpdate",
+          "rd.signup.process",
           "identity.resolve",
           "messaging.send"
         ]
@@ -107,6 +109,7 @@
         "capsule:somesh-telecom",
         "economic.triggerPayout",
         "economic.ledgerUpdate",
+        "rd.signup.process",
         "identity.resolve",
         "messaging.send"
       ]

@@ -42,6 +42,19 @@ export interface WalletBinding {
   metadata?: Record<string, any>; // optional metadata
 }
 
+export interface CapabilityProfile {
+  id?: string;
+  name?: string;
+  label?: string;
+  capabilities: string[];
+}
+
+export interface AgentRegistry {
+  agents: AgentIdentity[];
+  capabilityProfiles: CapabilityProfile[];
+  walletBindings: WalletBinding[];
+}
+
 /**
  * CapsuleExecutionContext
  * -----------------------
@@ -69,5 +82,6 @@ export interface CapsuleExecutionContext {
     route: string,
     payload: any
   ) => Promise<any>;
+  rdSignup?: (input: Record<string, unknown>) => Promise<any>;
   payout: (amount: number, currency: string) => Promise<any>;
 }

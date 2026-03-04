@@ -22,7 +22,7 @@ export class AgentRuntime {
 
   loadRegistry(): AgentRegistry {
     const raw = fs.readFileSync(this.registryPath, "utf8");
-    const parsed = JSON.parse(raw) as AgentRegistry;
+    const parsed = JSON.parse(raw.replace(/^\uFEFF/, "")) as AgentRegistry;
     this.validate(parsed);
     this.cache = parsed;
     return parsed;
