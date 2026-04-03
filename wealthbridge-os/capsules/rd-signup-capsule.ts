@@ -11,6 +11,8 @@ import {
   upsertTaxCapsule
 } from "../integrations/member-tax-registry";
 import type { RDSignupFlags, RDSignupInput, RDSignupResult } from "./rd-signup-types";
+import { loadRDSignupConfig } from "../src/config/rd-signup-config";
+import { writeJsonAtomic } from "../src/lib/store-utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +24,7 @@ interface DraftTaxPackageResult {
 }
 
 export async function handleRDSignup(input: RDSignupInput): Promise<RDSignupResult> {
+  const config = loadRDSignupConfig();
   const normalized = normalizeInput(input);
   const eligibilityScore = calculateEligibilityScore(normalized);
   const flags = deriveFlags(eligibilityScore, normalized);
@@ -36,15 +39,23 @@ export async function handleRDSignup(input: RDSignupInput): Promise<RDSignupResu
     chatHistorySummary
   });
 
-  const rdLog = generateRDLog({
-    memberId: memberStub.memberId,
-    name: normalized.name,
-    businessType: normalized.businessType,
-    hasPrototypes: normalized.hasPrototypes,
-    chatHistorySummary,
-    country: normalized.country,
-    state: normalized.state
-  });
+  const rdLog = generateRDLog(
+    {
+      memberId: memberStub.memberId,
+      name: normalized.name,
+      businessType: normalized.businessType,
+      hasPrototypes: normalized.hasPrototypes,
+      chatHistorySummary,
+      country: normalized.country,
+      state: normalized.state
+    },
+    {
+      dataRoot: config.paths.dataRoot,
+      docsRoot: config.paths.docsRoot,
+      snapshotsDir: config.paths.snapshotsDir,
+      retention: config.snapshotsRetention
+    }
+  );
 
   const draftTaxPackage = createDraftTaxPackage({
     memberId: memberStub.memberId,
@@ -53,7 +64,7 @@ export async function handleRDSignup(input: RDSignupInput): Promise<RDSignupResu
     flags,
     generatedRDLogPath: rdLog.markdownPath,
     chatHistorySummary
-  });
+  }, config);
 
   const member = upsertMember({
     profile: normalized,
@@ -182,10 +193,10 @@ function createDraftTaxPackage(input: {
   flags: RDSignupFlags;
   generatedRDLogPath: string;
   chatHistorySummary: string;
-}): DraftTaxPackageResult {
+}, config: ReturnType<typeof loadRDSignupConfig>): DraftTaxPackageResult {
   const now = new Date().toISOString();
-  const jsonPath = normalizePath(path.join("data", "tax", "rd-packages", `${input.memberId}.json`));
-  const markdownPath = normalizePath(path.join("docs", "tax", "rd-packages", `${input.memberId}.md`));
+  const jsonPath = normalizePath(path.join(config.paths.dataRoot, "tax", "rd-packages", `${input.memberId}.json`));
+  const markdownPath = normalizePath(path.join(config.paths.docsRoot, "tax", "rd-packages", `${input.memberId}.md`));
   const packagePayload = {
     schema: "wealthbridge.rd-tax-package.v1",
     generatedAt: now,
@@ -236,14 +247,18 @@ function createDraftTaxPackage(input: {
     "- Collect financial support for qualified expenses."
   ].join("\n");
 
-  writeFile(jsonPath, JSON.stringify(packagePayload, null, 2));
+  writeJsonAtomic(jsonPath, packagePayload, {
+    snapshotsDir: config.paths.snapshotsDir,
+    retention: config.snapshotsRetention,
+    snapshotLabel: "rd-tax-package"
+  });
   writeFile(markdownPath, markdown);
 
   return { jsonPath, markdownPath };
 }
 
 function writeFile(relativePath: string, contents: string): void {
-  const absolutePath = path.resolve(REPO_ROOT, relativePath);
+  const absolutePath = path.isAbsolute(relativePath) ? relativePath : path.resolve(REPO_ROOT, relativePath);
   fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
   fs.writeFileSync(absolutePath, contents, "utf8");
 }

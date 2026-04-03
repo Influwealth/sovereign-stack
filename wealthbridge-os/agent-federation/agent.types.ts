@@ -14,7 +14,14 @@ export interface AgentIdentity {
   did: string;                    // decentralized identifier
   role: "standard" | "admin" | "superadmin";
   walletId: string;               // links to WalletBinding
+  description?: string;
   capabilities: string[];         // capability profile (capsule.route)
+  allowedCapsules?: string[];
+  healthCheckPath?: string;
+  execPath?: string;
+  version?: string;
+  enabled?: boolean;
+  routingHints?: string[];
   permissions: {
     capsules: string[];           // capsule-level permissions
     routes: string[];             // route-level permissions
@@ -36,9 +43,11 @@ export interface AgentIdentity {
  */
 
 export interface WalletBinding {
+  agentId?: string;
   walletId: string;               // unique wallet reference
   network: string;                // e.g. "circle-mainnet", "polygon", "mpesa"
   address: string;                // wallet address or account identifier
+  type?: string;
   metadata?: Record<string, any>; // optional metadata
 }
 

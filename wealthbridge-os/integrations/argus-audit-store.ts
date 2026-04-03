@@ -1,10 +1,18 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
+import { loadRDSignupConfig } from "../src/config/rd-signup-config";
+import { argusAuditStoreSchema, readJsonValidated, writeJsonAtomic } from "../src/lib/store-utils";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const STORE_PATH = path.resolve(__dirname, "..", "data", "argus-rd-signup-audit.json");
+function getStorePath(): string {
+  return loadRDSignupConfig().paths.argusAudit;
+}
+
+function getSnapshotOptions() {
+  const cfg = loadRDSignupConfig();
+  return {
+    snapshotsDir: cfg.paths.snapshotsDir,
+    retention: cfg.snapshotsRetention,
+    snapshotLabel: "argus-audit"
+  } as const;
+}
 
 export interface ArgusAuditRecord {
   id: string;
@@ -17,7 +25,7 @@ export interface ArgusAuditRecord {
   intent?: string;
   capabilityId?: string;
   status: "received" | "completed" | "failed" | "recorded";
-  payload: unknown;
+  payload?: unknown;
 }
 
 interface ArgusAuditStore {
@@ -46,20 +54,7 @@ export function appendArgusAuditRecord(input: Omit<ArgusAuditRecord, "id" | "ts"
 }
 
 function readStore(): ArgusAuditStore {
-  if (!fs.existsSync(STORE_PATH)) {
-    return { ...EMPTY_STORE, records: [] };
-  }
-
-  try {
-    const raw = fs.readFileSync(STORE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as ArgusAuditStore;
-    if (!Array.isArray(parsed.records)) {
-      return { ...EMPTY_STORE, records: [] };
-    }
-    return parsed;
-  } catch (_error) {
-    return { ...EMPTY_STORE, records: [] };
-  }
+  return readJsonValidated(getStorePath(), argusAuditStoreSchema, { ...EMPTY_STORE, records: [] });
 }
 
 function writeStore(store: ArgusAuditStore): void {
@@ -67,6 +62,5 @@ function writeStore(store: ArgusAuditStore): void {
     ...store,
     updatedAt: new Date().toISOString()
   };
-  fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
-  fs.writeFileSync(STORE_PATH, JSON.stringify(updated, null, 2), "utf8");
+  writeJsonAtomic(getStorePath(), updated, getSnapshotOptions());
 }

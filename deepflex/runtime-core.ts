@@ -72,7 +72,18 @@ export interface RuntimeCoreOptions {
   signatureScheme?: SignatureScheme;
   settlementStub?: FinancialSettlementStub;
   requireIdentityVerification?: boolean;
+  loggerHook?: RuntimeLoggerHook;
+  supervisorHook?: RuntimeSupervisorHook;
 }
+
+export type RuntimeLoggerHook = (event: string, detail?: Record<string, unknown>) => void;
+
+export type RuntimeSupervisorHook = (input: {
+  agentId: string;
+  event: string;
+  detail?: Record<string, unknown>;
+  ts: string;
+}) => Promise<void> | void;
 
 interface DispatchOptions {
   skipIdentityVerification?: boolean;
@@ -126,6 +137,8 @@ export class DeepFlexRuntimeCore {
   private readonly signatureScheme: SignatureScheme;
   private readonly settlementStub: FinancialSettlementStub;
   private readonly requireIdentityVerification: boolean;
+  private readonly loggerHook?: RuntimeLoggerHook;
+  private supervisorHook?: RuntimeSupervisorHook;
   private messageSequence = 0;
 
   constructor(options: RuntimeCoreOptions = {}) {
@@ -139,6 +152,8 @@ export class DeepFlexRuntimeCore {
         eventBus: this.eventBus
       });
     this.requireIdentityVerification = options.requireIdentityVerification ?? true;
+    this.loggerHook = options.loggerHook;
+    this.supervisorHook = options.supervisorHook;
 
     this.registerSubsystem({
       identity: {
@@ -184,6 +199,10 @@ export class DeepFlexRuntimeCore {
       correlation_id: subsystemId,
       payload: subsystem.identity
     });
+    this.logRuntimeEvent("runtime.subsystem.registered", {
+      subsystemId,
+      did: subsystem.identity.did
+    });
   }
 
   hasSubsystem(subsystemId: string): boolean {
@@ -204,6 +223,59 @@ export class DeepFlexRuntimeCore {
 
   getSettlementStub(): FinancialSettlementStub {
     return this.settlementStub;
+  }
+
+  registerExternalNode(input: {
+    subsystemId: string;
+    did: string;
+    endpoint?: string;
+    zone?: string;
+    version?: string;
+    status?: "registered" | "healthy" | "degraded" | "offline";
+  }): void {
+    if (this.meshRegistry.isRegistered(input.subsystemId)) {
+      this.meshRegistry.setStatus(input.subsystemId, input.status ?? "registered");
+      return;
+    }
+
+    this.meshRegistry.register(input);
+  }
+
+  updateExternalNodeHealth(
+    subsystemId: string,
+    status: "registered" | "healthy" | "degraded" | "offline",
+    detail?: string
+  ): void {
+    if (!this.meshRegistry.isRegistered(subsystemId)) {
+      return;
+    }
+
+    this.meshRegistry.setStatus(subsystemId, status, detail);
+  }
+
+  getMeshHealthSnapshot() {
+    return this.meshRegistry.list();
+  }
+
+  setSupervisorHook(hook: RuntimeSupervisorHook): void {
+    this.supervisorHook = hook;
+  }
+
+  async notifySupervisor(agentId: string, event: string, detail?: Record<string, unknown>): Promise<void> {
+    if (!this.supervisorHook) {
+      return;
+    }
+
+    await this.supervisorHook({
+      agentId,
+      event,
+      detail,
+      ts: new Date().toISOString()
+    });
+  }
+
+  logRuntimeEvent(event: string, detail?: Record<string, unknown>): void {
+    this.loggerHook?.(event, detail);
   }
 
   createMessageId(prefix = "sap"): string {
@@ -234,6 +306,12 @@ export class DeepFlexRuntimeCore {
         intent: message.intent,
         capability_id: message.capability_id
       }
+    });
+    this.logRuntimeEvent("sap.dispatch.received", {
+      messageId: message.message_id,
+      from: message.from,
+      to: message.to,
+      intent: message.intent
     });
 
     return this.dispatchInternal(message, {});
@@ -293,6 +371,11 @@ export class DeepFlexRuntimeCore {
           financial: financialDecision
         }
       });
+      this.logRuntimeEvent("sap.dispatch.completed", {
+        messageId: message.message_id,
+        to: message.to,
+        intent: message.intent
+      });
 
       return {
         ok: true,
@@ -305,18 +388,26 @@ export class DeepFlexRuntimeCore {
         result
       };
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      err.message = `[sap:${message.message_id}] ${err.message}`;
       this.eventBus.publish({
         type: "sap.dispatch.failed",
         source: "runtime-core",
         correlation_id: message.message_id,
         payload: {
-          error: String(error),
+          error: err.message,
           from: message.from,
           to: message.to,
           intent: message.intent
         }
       });
-      throw error;
+      this.logRuntimeEvent("sap.dispatch.failed", {
+        messageId: message.message_id,
+        to: message.to,
+        intent: message.intent,
+        error: err.message
+      });
+      throw err;
     }
   }
 

@@ -4,12 +4,25 @@
   "type": "module",
   "scripts": {
     "serve:rd-signup": "tsx scripts/rd-signup-server.ts",
-    "preinstall": "node preinstall.js"
+    "preinstall": "node preinstall.js",
+    "dev": "tsx scripts/rd-signup-server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/scripts/rd-signup-server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "fastify": "^5.6.1"
+    "@fastify/rate-limit": "^9.1.0",
+    "fastify": "^5.6.1",
+    "pino": "^9.0.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "tsx": "^4.21.0"
+    "@types/node": "^22.7.5",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.6.3",
+    "vitest": "^1.6.0"
   }
 }

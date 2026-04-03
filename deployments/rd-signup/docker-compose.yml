@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  rd-signup:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    environment:
+      RD_SIGNUP_HOST: "0.0.0.0"
+      RD_SIGNUP_PORT: "8088"
+      RD_SIGNUP_AGENT_ID: "agent_001"
+      RD_DATA_ROOT: "/app/data"
+      RD_DOCS_ROOT: "/app/docs"
+    ports:
+      - "8088:8088"
+    volumes:
+      - ../../data:/app/data
+      - ../../docs:/app/docs
+    restart: unless-stopped

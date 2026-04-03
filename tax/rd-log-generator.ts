@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { writeJsonAtomic } from "../wealthbridge-os/src/lib/store-utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,10 +38,21 @@ export interface RDLogGeneratorResult {
   generatedAt: string;
 }
 
-export function generateRDLog(input: RDLogGeneratorInput): RDLogGeneratorResult {
+interface RDLogGeneratorOptions {
+  dataRoot?: string;
+  docsRoot?: string;
+  snapshotsDir?: string;
+  retention?: number;
+}
+
+export function generateRDLog(input: RDLogGeneratorInput, options: RDLogGeneratorOptions = {}): RDLogGeneratorResult {
   const generatedAt = new Date().toISOString();
-  const markdownPath = normalizePath(path.join("docs", "tax", "rd-logs", `${input.memberId}.md`));
-  const jsonPath = normalizePath(path.join("data", "tax", "rd-logs", `${input.memberId}.json`));
+  const dataRoot = options.dataRoot ?? path.resolve(REPO_ROOT, "data");
+  const docsRoot = options.docsRoot ?? path.resolve(REPO_ROOT, "docs");
+  const snapshotsDir = options.snapshotsDir ?? path.resolve(dataRoot, "tax", ".snapshots");
+
+  const markdownPath = normalizePath(path.join(docsRoot, "tax", "rd-logs", `${input.memberId}.md`));
+  const jsonPath = normalizePath(path.join(dataRoot, "tax", "rd-logs", `${input.memberId}.json`));
 
   const projects = buildProjects(input);
   const document = {
@@ -57,7 +69,11 @@ export function generateRDLog(input: RDLogGeneratorInput): RDLogGeneratorResult 
     projects
   };
 
-  writeFile(jsonPath, JSON.stringify(document, null, 2));
+  writeJsonAtomic(jsonPath, document, {
+    snapshotsDir,
+    retention: options.retention,
+    snapshotLabel: "rd-log"
+  });
   writeFile(markdownPath, toMarkdown(document));
 
   return {
@@ -172,8 +188,7 @@ function toMarkdown(document: {
   return sections.join("\n");
 }
 
-function writeFile(relativePath: string, contents: string): void {
-  const absolutePath = path.resolve(REPO_ROOT, relativePath);
+function writeFile(absolutePath: string, contents: string): void {
   fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
   fs.writeFileSync(absolutePath, contents, "utf8");
 }

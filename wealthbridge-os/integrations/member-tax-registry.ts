@@ -1,13 +1,19 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type { RDSignupFlags, RDSignupInput } from "../capsules/rd-signup-types";
 import type { BenefitsRouterResult } from "./benefits-router";
+import { loadRDSignupConfig } from "../src/config/rd-signup-config";
+import { rdSignupRecordSchema, writeJsonAtomic, readJsonValidated } from "../src/lib/store-utils";
+function getStorePath(): string {
+  return loadRDSignupConfig().paths.signupRecords;
+}
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const STORE_PATH = path.resolve(__dirname, "..", "data", "rd-signup-records.json");
+function getSnapshotOptions() {
+  const cfg = loadRDSignupConfig();
+  return {
+    snapshotsDir: cfg.paths.snapshotsDir,
+    retention: cfg.snapshotsRetention,
+    snapshotLabel: "rd-signup-records"
+  } as const;
+}
 
 export interface WealthBridgeMemberRecord {
   memberId: string;
@@ -210,20 +216,8 @@ export function routeIntoWorkforceBenefitsLoop(memberId: string, route: Benefits
 }
 
 function readStore(): RegistryStore {
-  if (!fs.existsSync(STORE_PATH)) {
-    return { ...EMPTY_STORE, members: [], taxCapsules: [] };
-  }
-
-  try {
-    const raw = fs.readFileSync(STORE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as RegistryStore;
-    if (!Array.isArray(parsed.members) || !Array.isArray(parsed.taxCapsules)) {
-      return { ...EMPTY_STORE, members: [], taxCapsules: [] };
-    }
-    return parsed;
-  } catch (_error) {
-    return { ...EMPTY_STORE, members: [], taxCapsules: [] };
-  }
+  const storePath = getStorePath();
+  return readJsonValidated(storePath, rdSignupRecordSchema, { ...EMPTY_STORE, members: [], taxCapsules: [] });
 }
 
 function writeStore(store: RegistryStore): void {
@@ -231,8 +225,7 @@ function writeStore(store: RegistryStore): void {
     ...store,
     updatedAt: new Date().toISOString()
   };
-  fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
-  fs.writeFileSync(STORE_PATH, JSON.stringify(updated, null, 2), "utf8");
+  writeJsonAtomic(getStorePath(), updated, getSnapshotOptions());
 }
 
 function createMemberId(email: string): string {

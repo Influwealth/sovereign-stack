@@ -37,13 +37,28 @@ export {
 } from "./signature-scheme";
 
 export {
+  AGENT_LINEUP,
+  CAPSULE_AGENT_ASSIGNMENTS,
+  createAgentMeshHealth,
+  getAgentLineupDefinition,
+  getCapsuleAgentAssignment,
+  getCapsuleAgentAssignments,
+  installAgentMesh,
+  runAgentHealthSweep,
+  type AgentLineupDefinition,
+  type CapsuleAgentAssignment
+} from "./agent-lineup";
+
+export {
   DeepFlexRuntimeCore,
   createLocalSignature,
   evaluateFinancialIntentStub,
   type FinancialIntent,
   type FinancialIntentDecision,
+  type RuntimeLoggerHook,
   type SAPMessage,
   type SAPDispatchResult,
+  type RuntimeSupervisorHook,
   type RuntimeSubsystem,
   type RuntimeSubsystemIdentity
 } from "./runtime-core";

@@ -24,4 +24,5 @@ export interface RDSignupResult {
   generatedTaxPackagePath: string;
   wealthbridgeMemberId: string;
   taxCapsuleId: string;
+  correlationId?: string;
 }

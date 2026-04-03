@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 import { AgentRuntime } from "./agent-runtime";
+import type { AgentExecutionRequest, AgentExecutionResult, AgentHealthStatus } from "./agent-runtime";
 import { AgentWallet, payoutAgent } from "./agent-wallet";
 import { evaluateAgentPolicy } from "./agent-policy";
 import type { AgentIdentity } from "./agent.types";
@@ -11,11 +14,15 @@ import type { RDSignupInput, RDSignupResult } from "../capsules/rd-signup-types"
 import {
   ARGUS_AUDIT_CAPABILITY_ID,
   ARGUS_AUDIT_INTENT,
+  AGENT_LINEUP,
   RD_SIGNUP_CAPABILITY_ID,
   RD_SIGNUP_INTENT,
   RD_SIGNUP_TARGET_SUBSYSTEM,
   CapsuleSandbox,
   DeepFlexRuntimeCore,
+  getCapsuleAgentAssignment,
+  installAgentMesh,
+  runAgentHealthSweep,
   createRDSignupFinancialIntentStub,
   createIdentitySubsystem,
   type FinancialIntent,
@@ -49,6 +56,22 @@ interface RDSignupAuditPayload {
   capabilityId?: string;
   status: "received" | "completed" | "failed";
   payload: unknown;
+}
+
+interface AgentTaskRoutingRequest {
+  intent: string;
+  capsuleName?: string;
+  route?: string;
+  payload?: unknown;
+  preferredAgentId?: string;
+  allowFallback?: boolean;
+  timeoutMs?: number;
+}
+
+interface AgentRoutingDecision {
+  primaryAgentId: string;
+  fallbackAgentIds: string[];
+  reason: string;
 }
 
 // ---------------------------------------------------------
@@ -105,6 +128,7 @@ export class AgentOrchestrator {
     route: string,
     payload: any
   ) {
+    const correlationId = randomUUID();
     // Policy check
     const allowed = evaluateAgentPolicy(agent, capsuleName, route);
     if (!allowed) {
@@ -120,8 +144,13 @@ export class AgentOrchestrator {
       payload
     });
 
-    const dispatch = await this.runtimeCore.dispatch(message);
-    return dispatch.result;
+    try {
+      const dispatch = await this.runtimeCore.dispatch(message);
+      const result = (dispatch.result ?? {}) as Record<string, unknown>;
+      return { ...result, correlationId };
+    } catch (error) {
+      throw this.wrapError(error, correlationId);
+    }
   }
 
   // List all capsules available to the agent
@@ -131,6 +160,7 @@ export class AgentOrchestrator {
   }
 
   private async executePayout(agent: AgentIdentity, amount: number, currency: string) {
+    const correlationId = randomUUID();
     const normalizedAmount = Number(amount);
     if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
       throw new Error("Payout amount must be a positive number.");
@@ -165,11 +195,17 @@ export class AgentOrchestrator {
       financialIntent
     );
 
-    const dispatch = await this.runtimeCore.dispatch(message);
-    return dispatch.result;
+    try {
+      const dispatch = await this.runtimeCore.dispatch(message);
+      const result = (dispatch.result ?? {}) as Record<string, unknown>;
+      return { ...result, correlationId } as unknown as RDSignupResult;
+    } catch (error) {
+      throw this.wrapError(error, correlationId);
+    }
   }
 
   async executeRDSignupIntent(agent: AgentIdentity, input: RDSignupInput): Promise<RDSignupResult> {
+    const correlationId = randomUUID();
     if (!this.agentHasCapability(agent, RD_SIGNUP_CAPABILITY_ID)) {
       throw new Error(
         `Policy violation: Agent ${agent.id} lacks required capability '${RD_SIGNUP_CAPABILITY_ID}'.`
@@ -186,8 +222,124 @@ export class AgentOrchestrator {
       financialIntent
     );
 
-    const dispatch = await this.runtimeCore.dispatch(message);
-    return dispatch.result as RDSignupResult;
+    try {
+      const dispatch = await this.runtimeCore.dispatch(message);
+      return { ...(dispatch.result as RDSignupResult), correlationId };
+    } catch (error) {
+      throw this.wrapError(error, correlationId);
+    }
+  }
+
+  healthCheck() {
+    const requiredSubsystems = [
+      RD_SIGNUP_TARGET_SUBSYSTEM,
+      "capsule-runtime",
+      "financial-intent",
+      "argus-audit",
+      "rd-signup-audit-bridge"
+    ];
+
+    const missing = requiredSubsystems.filter((id) => !this.runtimeCore.hasSubsystem(id));
+
+    let registryOk = true;
+    try {
+      this.runtime.getRegistry();
+    } catch (_err) {
+      registryOk = false;
+    }
+
+    return {
+      ok: missing.length === 0 && registryOk,
+      registryOk,
+      missingSubsystems: missing,
+      agentLineup: AGENT_LINEUP.map((agent) => ({
+        agentId: agent.id,
+        execPath: agent.execPath,
+        healthCheckPath: agent.healthCheckPath,
+        enabled: agent.enabled
+      }))
+    };
+  }
+
+  async routeAgentTask(request: AgentTaskRoutingRequest): Promise<{
+    decision: AgentRoutingDecision;
+    result: AgentExecutionResult;
+  }> {
+    const decision = this.selectAgentForTask(request);
+    const executionRequest: AgentExecutionRequest = {
+      intent: request.intent,
+      capsuleName: request.capsuleName,
+      route: request.route,
+      payload: request.payload,
+      timeoutMs: request.timeoutMs,
+      metadata: {
+        preferredAgentId: request.preferredAgentId,
+        allowFallback: request.allowFallback !== false
+      }
+    };
+
+    let result = await this.runtime.executeAgent(decision.primaryAgentId, executionRequest);
+    if (result.ok || request.allowFallback === false) {
+      return { decision, result };
+    }
+
+    for (const fallbackAgentId of decision.fallbackAgentIds) {
+      result = await this.runtime.executeAgent(fallbackAgentId, executionRequest);
+      if (result.ok) {
+        return {
+          decision: {
+            ...decision,
+            reason: `${decision.reason} Fallback succeeded with '${fallbackAgentId}'.`
+          },
+          result
+        };
+      }
+    }
+
+    return { decision, result };
+  }
+
+  async healthCheckAgents(): Promise<AgentHealthStatus[]> {
+    return await this.runtime.healthCheckAllAgents();
+  }
+
+  selectAgentForTask(request: AgentTaskRoutingRequest): AgentRoutingDecision {
+    const capsuleAssignment = request.capsuleName
+      ? getCapsuleAgentAssignment(request.capsuleName)
+      : undefined;
+
+    const enabledAgents = this.runtime.listEnabledAgents();
+    const preferredAgent = request.preferredAgentId
+      ? enabledAgents.find((agent) => agent.id === request.preferredAgentId)
+      : undefined;
+
+    if (preferredAgent && this.canHandle(preferredAgent, request)) {
+      return {
+        primaryAgentId: preferredAgent.id,
+        fallbackAgentIds: this.buildFallbackAgentOrder(preferredAgent.id, request),
+        reason: `Preferred agent '${preferredAgent.id}' accepted the routing request.`
+      };
+    }
+
+    if (capsuleAssignment) {
+      const primaryCapsuleAgent = enabledAgents.find((agent) => agent.id === capsuleAssignment.primaryAgent);
+      if (primaryCapsuleAgent && this.canHandle(primaryCapsuleAgent, request)) {
+        return {
+          primaryAgentId: primaryCapsuleAgent.id,
+          fallbackAgentIds: capsuleAssignment.fallbackAgents.filter((agentId) =>
+            enabledAgents.some((agent) => agent.id === agentId)
+          ),
+          reason: `Capsule '${request.capsuleName}' is assigned to '${primaryCapsuleAgent.id}'.`
+        };
+      }
+    }
+
+    const selected = enabledAgents.find((agent) => this.canHandle(agent, request)) ?? this.loadAgent("deepflex-uhura");
+    return {
+      primaryAgentId: selected.id,
+      fallbackAgentIds: this.buildFallbackAgentOrder(selected.id, request),
+      reason: `Selected '${selected.id}' using placeholder agent capability matching.`
+    };
   }
 
   private buildSAPMessage<TPayload>(
@@ -216,6 +368,12 @@ export class AgentOrchestrator {
       ...unsignedEnvelope,
       signature: this.runtimeCore.signMessage(agent.id, unsignedEnvelope)
     };
+  }
+
+  private wrapError(error: unknown, correlationId: string): Error {
+    const err = error instanceof Error ? error : new Error(String(error));
+    err.message = `[corr:${correlationId}] ${err.message}`;
+    return err;
   }
 
   private ensureAgentRegistered(agent: AgentIdentity): void {
@@ -276,7 +434,16 @@ export class AgentOrchestrator {
   }
 
   private createRuntimeCore(): DeepFlexRuntimeCore {
-    const runtimeCore = new DeepFlexRuntimeCore();
+    const runtimeCore = new DeepFlexRuntimeCore({
+      loggerHook: (event, detail) => {
+        if (event.startsWith("agent.")) {
+          void runtimeCore.notifySupervisor("deepflex-uhura", event, detail);
+        }
+      },
+      supervisorHook: async () => {
+        // TODO: wire supervisor notifications to deepflex-uhura runtime channels.
+      }
+    });
 
     runtimeCore.registerSubsystem(
       createIdentitySubsystem({
@@ -329,10 +496,100 @@ export class AgentOrchestrator {
     runtimeCore.registerSubsystem(this.createRDSignupIntentSubsystem());
     runtimeCore.registerSubsystem(this.createArgusAuditSubsystem());
     runtimeCore.registerSubsystem(this.createRDAuditBridgeSubsystem());
+    installAgentMesh(runtimeCore);
 
     this.bindRDSignupAuditBridge(runtimeCore);
+    void runAgentHealthSweep(runtimeCore);
 
     return runtimeCore;
+  }
+
+  private buildFallbackAgentOrder(primaryAgentId: string, request: AgentTaskRoutingRequest): string[] {
+    const capsuleAssignment = request.capsuleName
+      ? getCapsuleAgentAssignment(request.capsuleName)
+      : undefined;
+    const ordered = [
+      ...(capsuleAssignment?.fallbackAgents ?? []),
+      "deepflex-uhura",
+      "codex",
+      "claude-code",
+      "gemini-cli",
+      "turbo-quant",
+      "godmode-browser",
+      "ad-autonomous"
+    ];
+
+    return [...new Set(ordered)].filter((agentId) => agentId !== primaryAgentId);
+  }
+
+  private canHandle(agent: AgentIdentity, request: AgentTaskRoutingRequest): boolean {
+    switch (agent.id) {
+      case "claude-code":
+        return this.canHandleClaudeCode(request);
+      case "gemini-cli":
+        return this.canHandleGeminiCli(request);
+      case "codex":
+        return this.canHandleCodex(request);
+      case "deepflex-uhura":
+        return this.canHandleDeepflexUhura(request);
+      case "turbo-quant":
+        return this.canHandleTurboQuant(request);
+      case "godmode-browser":
+        return this.canHandleGodmodeBrowser(request);
+      case "ad-autonomous":
+        return this.canHandleAdAutonomous(request);
+      default:
+        return false;
+    }
+  }
+
+  private canHandleClaudeCode(request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace keyword matching with Claude Code capability introspection.
+    return this.matchesRequest(request, ["compute", "observability", "debug", "refactor", "draft"]);
+  }
+
+  private canHandleGeminiCli(request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace keyword matching with Gemini CLI policy/research routing logic.
+    return this.matchesRequest(request, ["identity", "compliance", "policy", "analysis", "research"]);
+  }
+
+  private canHandleCodex(request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace keyword matching with Codex code-task and ops routing logic.
+    return this.matchesRequest(request, ["compute", "implement", "patch", "review", "business-ops"]);
+  }
+
+  private canHandleDeepflexUhura(_request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace catch-all fallback with supervisor-specific guardrails and escalation policy.
+    return true;
+  }
+
+  private canHandleTurboQuant(request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace keyword matching with quantitative planner selection logic.
+    return this.matchesRequest(request, ["economic", "funding", "quant", "forecast", "score"]);
+  }
+
+  private canHandleGodmodeBrowser(request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace keyword matching with browser automation routing and policy gates.
+    return this.matchesRequest(request, ["browser", "social", "observability", "monitor", "scrape"]);
+  }
+
+  private canHandleAdAutonomous(request: AgentTaskRoutingRequest): boolean {
+    // TODO: replace keyword matching with campaign intent classification.
+    return this.matchesRequest(request, ["campaign", "outreach", "growth", "social", "ads"]);
+  }
+
+  private matchesRequest(request: AgentTaskRoutingRequest, tokens: string[]): boolean {
+    const haystack = [
+      request.intent,
+      request.capsuleName,
+      request.route,
+      typeof request.payload === "string" ? request.payload : ""
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return tokens.some((token) => haystack.includes(token.toLowerCase()));
   }
 
   private createCapsuleRuntimeSubsystem(): RuntimeSubsystem {
