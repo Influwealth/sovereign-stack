@@ -1,0 +1,80 @@
+{
+  "manifest_id": "WBOS-WORKSPACE-001",
+  "version": "1.0.0",
+  "created_at": "2026-05-30T00:00:00Z",
+  "classification": "INTERNAL",
+  "description": "Unified Sovereign Workspace — WealthBridge OS multi-agent coordination layer",
+  "supabase_project": "wealthbridge-core",
+  "supabase_region": "us-west-1",
+  "bucket": "agent-shared",
+  "github_repo": "Influwealth/sovereign-stack",
+  "workspace_root": "sovereign-workspace/",
+
+  "agents": [
+    {
+      "id": "AGT-DEEPFLEX-001",
+      "name": "DeepFlex (Claude)",
+      "role": "Supervisor — Architecture, Documentation, Governance",
+      "lane": "DEEPFLEX",
+      "model": "claude-sonnet-4-6",
+      "events_path": "events/deepflex/",
+      "triggers": ["build", "deploy", "architecture", "compliance", "capsule_spec"]
+    },
+    {
+      "id": "AGT-CHATGPT-001",
+      "name": "ChatGPT (Uhura)",
+      "role": "Engineer — TypeScript, Prisma, Smart Contracts",
+      "lane": "CHATGPT",
+      "model": "gpt-4o",
+      "events_path": "events/chatgpt/",
+      "triggers": ["repo_patch", "content", "typescript", "prisma"]
+    },
+    {
+      "id": "AGT-GEMINI-001",
+      "name": "Gemini",
+      "role": "Automator — Dashboards, Content, Document Generation",
+      "lane": "GEMINI",
+      "model": "gemini-1.5-pro",
+      "events_path": "events/gemini/",
+      "triggers": ["document", "automation", "dashboard", "content_drop"]
+    },
+    {
+      "id": "AGT-PERPLEXITY-001",
+      "name": "Perplexity",
+      "role": "Recon — Real-time intelligence, Competitive analysis",
+      "lane": "PERPLEXITY",
+      "model": "perplexity-sonar",
+      "events_path": "events/perplexity/",
+      "triggers": ["research", "recon", "competitive_intel", "market_scan"]
+    }
+  ],
+
+  "folder_structure": {
+    "events/": {
+      "description": "Agent-specific inbound event queues",
+      "subfolders": ["perplexity/", "claude/", "gemini/", "chatgpt/", "deepflex/"]
+    },
+    "tasks/": {
+      "description": "Global task queue — all agents watch this",
+      "subfolders": ["build/", "research/", "deploy/", "sync/"]
+    },
+    "outputs/": {
+      "description": "Agent output artifacts",
+      "subfolders": ["reports/", "code/", "summaries/", "migrations/"]
+    }
+  },
+
+  "tables": [
+    "workspace",
+    "workspace_events",
+    "workspace_tasks",
+    "workspace_outputs"
+  ],
+
+  "sync": {
+    "poll_interval_seconds": 30,
+    "caffeine_mirror": true,
+    "icp_bridge": false,
+    "realtime_enabled": true
+  }
+}

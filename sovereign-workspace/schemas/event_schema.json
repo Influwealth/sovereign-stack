@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WBOS Unified Event Schema",
+  "description": "Standard event envelope for all agent communications in the sovereign workspace",
+  "version": "1.0.0",
+  "schema_id": "WBOS-SCHEMA-EVENT-001",
+
+  "type": "object",
+  "required": ["event_id", "type", "source", "timestamp", "payload"],
+
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Unique event identifier",
+      "pattern": "^EVT-[0-9]{4}-[0-9]+$",
+      "example": "EVT-2026-1748567890123"
+    },
+    "type": {
+      "type": "string",
+      "description": "Task type / event category",
+      "enum": [
+        "build",
+        "research",
+        "deploy",
+        "sync",
+        "architecture",
+        "capsule_spec",
+        "content_drop",
+        "repo_patch",
+        "document",
+        "automation",
+        "dashboard",
+        "competitive_intel",
+        "market_scan",
+        "alert",
+        "heartbeat",
+        "error",
+        "completed"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Agent that emitted this event",
+      "enum": ["deepflex", "chatgpt", "gemini", "perplexity", "system", "human"]
+    },
+    "target": {
+      "type": "string",
+      "description": "Target agent (optional — omit for broadcast)",
+      "enum": ["deepflex", "chatgpt", "gemini", "perplexity", "all"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["LOW", "NORMAL", "HIGH", "CRITICAL"],
+      "default": "NORMAL"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "IN_PROGRESS", "COMPLETED", "FAILED", "CANCELLED"],
+      "default": "PENDING"
+    },
+    "cap_ref": {
+      "type": "string",
+      "description": "Capsule this event belongs to",
+      "example": "CAP-014"
+    },
+    "campaign_ref": {
+      "type": "string",
+      "description": "Campaign this event belongs to",
+      "example": "CAMP-2026-GVL-001"
+    },
+    "abl_ref": {
+      "type": "string",
+      "description": "AGI Behavior Log entry ID",
+      "example": "ABL-2026-001"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific data — structure varies by type",
+      "properties": {
+        "instruction": { "type": "string" },
+        "context": { "type": "object" },
+        "artifacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Paths to input artifacts in agent-shared bucket"
+        },
+        "output_path": {
+          "type": "string",
+          "description": "Where to write output in agent-shared bucket"
+        },
+        "metadata": { "type": "object" }
+      }
+    },
+    "output_ref": {
+      "type": "string",
+      "description": "Path to output artifact in agent-shared/outputs/"
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "message": { "type": "string" },
+        "retry_count": { "type": "integer" }
+      }
+    }
+  },
+
+  "examples": [
+    {
+      "event_id": "EVT-2026-1748567890001",
+      "type": "research",
+      "source": "deepflex",
+      "target": "perplexity",
+      "timestamp": "2026-05-30T06:00:00Z",
+      "priority": "HIGH",
+      "status": "PENDING",
+      "cap_ref": "CAP-014",
+      "payload": {
+        "instruction": "Research current CDFI funding landscape in Greenville NC",
+        "context": { "geo": "greenville-nc", "zip_codes": ["27834", "27858"] },
+        "output_path": "outputs/reports/gvl-cdfi-landscape-2026.json"
+      }
+    },
+    {
+      "event_id": "EVT-2026-1748567890002",
+      "type": "build",
+      "source": "deepflex",
+      "target": "chatgpt",
+      "timestamp": "2026-05-30T06:01:00Z",
+      "priority": "NORMAL",
+      "status": "PENDING",
+      "cap_ref": "CAP-016",
+      "payload": {
+        "instruction": "Build TypeScript Edge Function for create-alert-campaign",
+        "artifacts": ["sovereign-workspace/schemas/event_schema.json"],
+        "output_path": "outputs/code/create-alert-campaign.ts"
+      }
+    }
+  ]
+}

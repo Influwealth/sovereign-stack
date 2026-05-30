@@ -1,0 +1,43 @@
+{
+  "workspace_id": "WBOS-WORKSPACE-001",
+  "name": "Unified Sovereign Workspace",
+  "version": "1.0.0",
+  "last_synced": "2026-05-30T00:00:00Z",
+  "bucket": "agent-shared",
+  "supabase_project": "wealthbridge-core",
+  "github_repo": "Influwealth/sovereign-stack",
+  "caffeine_mirror": true,
+
+  "folder_map": {
+    "events/perplexity/": "events/perplexity/",
+    "events/claude/":     "events/claude/",
+    "events/gemini/":     "events/gemini/",
+    "events/chatgpt/":    "events/chatgpt/",
+    "events/deepflex/":   "events/deepflex/",
+    "tasks/build/":       "tasks/build/",
+    "tasks/research/":    "tasks/research/",
+    "tasks/deploy/":      "tasks/deploy/",
+    "tasks/sync/":        "tasks/sync/",
+    "outputs/reports/":   "outputs/reports/",
+    "outputs/code/":      "outputs/code/",
+    "outputs/summaries/": "outputs/summaries/",
+    "outputs/migrations/":"outputs/migrations/"
+  },
+
+  "agents": {
+    "deepflex":   { "watches": ["events/deepflex/","tasks/"], "writes": ["outputs/"] },
+    "chatgpt":    { "watches": ["events/chatgpt/","tasks/build/"], "writes": ["outputs/code/","outputs/migrations/"] },
+    "gemini":     { "watches": ["events/gemini/","tasks/deploy/","tasks/sync/"], "writes": ["outputs/reports/","outputs/summaries/"] },
+    "perplexity": { "watches": ["events/perplexity/","tasks/research/"], "writes": ["outputs/reports/"] }
+  },
+
+  "sync_scripts": {
+    "pull": "tsx sovereign-workspace/scripts/sync/supabase-caffeine-sync.ts",
+    "watchers": {
+      "deepflex":   "tsx sovereign-workspace/scripts/watchers/deepflex-watcher.ts",
+      "chatgpt":    "tsx sovereign-workspace/scripts/watchers/chatgpt-watcher.ts",
+      "gemini":     "tsx sovereign-workspace/scripts/watchers/gemini-watcher.ts",
+      "perplexity": "tsx sovereign-workspace/scripts/watchers/perplexity-watcher.ts"
+    }
+  }
+}
