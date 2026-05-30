@@ -1,0 +1,94 @@
+name: WBOS CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: Lint + TypeScript + Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Install WITHOUT running preinstall.js
+      # preinstall.js contains obfuscated eval — quarantined pending review
+      - name: Install dependencies (ignore-scripts)
+        run: npm install --ignore-scripts
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+
+  validate-migrations:
+    name: Validate Supabase Migrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check migration files exist
+        run: |
+          echo "Validating migration files..."
+          ls -la supabase/migrations/
+          echo "Migration count: $(ls supabase/migrations/*.sql | wc -l)"
+
+      - name: Validate SQL syntax (basic check)
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "Checking: $f"
+            # Check for required keywords in each migration
+            if ! grep -qiE "CREATE TABLE|CREATE INDEX|CREATE POLICY|CREATE TRIGGER|CREATE OR REPLACE FUNCTION" "$f"; then
+              echo "WARNING: $f may not contain expected DDL statements"
+            fi
+          done
+          echo "Migration validation complete"
+
+      - name: Check seed files
+        run: |
+          echo "Validating seed files..."
+          ls -la supabase/seed/ || echo "No seed directory found"
+
+  security-scan:
+    name: Security Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Flag obfuscated files
+        run: |
+          echo "Scanning for obfuscated eval patterns..."
+          if grep -r "eval(Buffer.from" . --include="*.js" --include="*.ts" \
+            --exclude-dir=node_modules --exclude-dir=dist; then
+            echo "⚠️  WARNING: Obfuscated eval detected — review flagged files before merge"
+            # Do not fail CI — flag for human review
+          else
+            echo "✅ No obfuscated eval patterns found"
+          fi
+
+      - name: Check for exposed secrets
+        run: |
+          echo "Checking for hardcoded secrets..."
+          if grep -rE "(sk_live|sk_test|eyJ[A-Za-z0-9_-]{20,}|PRIVATE KEY)" . \
+            --include="*.ts" --include="*.js" --include="*.json" \
+            --exclude-dir=node_modules --exclude-dir=dist; then
+            echo "❌ Potential secret detected — failing CI"
+            exit 1
+          else
+            echo "✅ No hardcoded secrets found"
+          fi
