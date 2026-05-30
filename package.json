@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "serve:rd-signup": "tsx scripts/rd-signup-server.ts",
-    "preinstall": "node preinstall.js",
     "dev": "tsx scripts/rd-signup-server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/scripts/rd-signup-server.js",

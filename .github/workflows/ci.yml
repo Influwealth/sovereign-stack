@@ -21,10 +21,11 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # Install WITHOUT running preinstall.js
-      # preinstall.js contains obfuscated eval — quarantined pending review
-      - name: Install dependencies (ignore-scripts)
-        run: npm install --ignore-scripts
+
+
+
+      - name: Install dependencies
+        run: npm install
 
       - name: TypeScript check
         run: npx tsc --noEmit
