@@ -1,0 +1,129 @@
+{
+  "monad_version": "3.7",
+  "mesh_id": "MONAD-SOVEREIGN-MESH-001",
+  "epoch": 1,
+  "sync_status": "INITIALIZING",
+  "created_at": "2026-06-05T00:00:00Z",
+  "nodes": {
+    "NODE_ALPHA": {
+      "role": "Sovereign Control Hub",
+      "host": "localhost",
+      "ports": { "primary": 8000, "secondary": 8001, "range_end": 8099 },
+      "repo": "sovereign-stack",
+      "module": "deepflex/supervisor-http.ts",
+      "agents": ["DeepFlex", "Codex"],
+      "network_slice": "001",
+      "status": "DEFINED"
+    },
+    "NODE_BETA": {
+      "role": "Quantum Bridge",
+      "host": "localhost",
+      "ports": { "primary": 9400, "range_end": 9499 },
+      "repos": ["turboqaunt-core", "qauntum-civilization-qml", "nvq-mesh-fabric"],
+      "agents": [],
+      "quantum_backend": "CUDA-Q v2.4",
+      "sovereign_quant": {
+        "level": 4,
+        "quantization": "INT4_per_channel",
+        "embedding_compression": "16x",
+        "transmission_reduction": "78%",
+        "vram_min_gb": 8
+      },
+      "network_slice": "001",
+      "status": "DEFINED"
+    },
+    "NODE_GAMMA": {
+      "role": "ICP Integration Gateway",
+      "host": "localhost",
+      "ports": { "primary": 4943 },
+      "repo": "qre-agent-platform",
+      "canisters": [
+        "SovereignState",
+        "IdentityVault",
+        "DataProvenance",
+        "CapsuleRouter",
+        "AgentRegistry"
+      ],
+      "token_canisters": {
+        "GVC": "greenville_coin.mo",
+        "GRN_USD": "grn_usd_canister"
+      },
+      "agents": [],
+      "network_slice": "001",
+      "status": "DEFINED"
+    },
+    "NODE_DELTA": {
+      "role": "NVIDIA 6G Aerial Substrate",
+      "host": "localhost",
+      "ports": { "primary": 38412, "api": 7760 },
+      "repo": "nvidia-resource-suite",
+      "module": "api_server.py",
+      "nim_models": [
+        "meta/llama-3.1-70b-instruct",
+        "nvidia/llama-3.1-nemotron-70b-instruct",
+        "microsoft/phi-3-vision-128k-instruct"
+      ],
+      "omniverse": true,
+      "ran_integration": "infraflow-ran-oai",
+      "agents": [],
+      "network_slice": "001",
+      "status": "DEFINED"
+    },
+    "NODE_EPSILON": {
+      "role": "Digital Twin & VR Interface",
+      "host": "localhost",
+      "ports": { "primary": 7791, "range_start": 3000, "range_end": 3099 },
+      "repos": ["vr-meeting-room", "eastflatbush-90s-unity", "roblox-wealthbridge-east-flatbush"],
+      "agents": ["VR Cockpit Primary", "VR Cockpit Secondary"],
+      "cloudxr_enabled": true,
+      "aframe_client": true,
+      "network_slice": "003",
+      "status": "DEFINED"
+    }
+  },
+  "network_slices": {
+    "001": { "name": "INFERENCE", "agents": ["DeepFlex", "Codex", "SynapZ"] },
+    "002": { "name": "MESH_ROUTING", "agents": ["Mesh Alpha", "Mesh Beta"] },
+    "003": { "name": "VR_INTERFACE", "agents": ["VR Cockpit Primary", "VR Cockpit Secondary"] }
+  },
+  "token_economy": {
+    "EBTK": { "tier": 1, "standard": "roblox", "peg": null, "purpose": "in-game economy" },
+    "GVC": { "tier": 2, "standard": "ICP Motoko", "peg": "1 GVC = 1 USD", "cents_per_token": 100, "bridge_rate": "100 EBTK = 1 GVC" },
+    "GRN_USD": { "tier": 2, "standard": "ICP Motoko", "peg": "1:1 USD", "collateral": "53-acre Greenville land + bank deposits", "redeemable_at": "Greenville Charter Community Bank" },
+    "WBST": { "tier": 3, "standard": "WealthBridge", "peg": null, "purpose": "service tokens" }
+  },
+  "anchor_sites": {
+    "east_flatbush": {
+      "address": "458 E 94th St, Brooklyn, NY",
+      "role": "Cultural origin point",
+      "digital_twin": "eastflatbush-90s-unity",
+      "documentary": "The 458 Frequency",
+      "documentary_platform": "Synapz"
+    },
+    "greenville_nc": {
+      "description": "53-acre Monadic anchor site",
+      "role": "First sovereign Black civilization site",
+      "digital_twin": "nvidia-resource-suite/omniverse",
+      "stablecoin": "GRN-USD",
+      "bank": "Greenville Charter Community Bank (in development)",
+      "governance": "on-chain ICP vote"
+    }
+  },
+  "three_world_cosmology": {
+    "upper_world": {
+      "name": "The Akashic Field",
+      "layer": "AI inference",
+      "maps_to": ["NODE_ALPHA", "NODE_DELTA"]
+    },
+    "middle_world": {
+      "name": "The Earth Grid",
+      "layer": "Physical + digital territory",
+      "maps_to": ["NODE_EPSILON", "anchor_sites"]
+    },
+    "lower_world": {
+      "name": "The Tar Deep",
+      "layer": "ICP blockchain substrate",
+      "maps_to": ["NODE_GAMMA", "NODE_BETA"]
+    }
+  }
+}

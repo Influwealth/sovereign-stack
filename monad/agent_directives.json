@@ -1,0 +1,104 @@
+{
+  "monad_version": "3.7",
+  "directive_epoch": 1,
+  "agents": {
+    "DeepFlex": {
+      "node": "NODE_ALPHA",
+      "network_slice": "001",
+      "role": "Primary inference and routing supervisor",
+      "repo": "sovereign-stack",
+      "entry": "deepflex/supervisor-http.ts",
+      "port": 8000,
+      "directive": {
+        "primary_function": "Route all inter-service task dispatch",
+        "routing_rules": {
+          "device_ops": "forward to NODE_ALPHA:7700 (Argus Prime)",
+          "business_logic": "forward to port 8001 (WealthBridge OS)",
+          "inference": "forward to NODE_DELTA:7760 (NVIDIA)",
+          "identity": "forward to NODE_GAMMA:4943 (ICP)",
+          "vr": "forward to NODE_EPSILON:7791 (VR Room)"
+        },
+        "sap_headers_required": true,
+        "ttl_ms": { "critical": 500, "standard": 5000, "background": 60000 }
+      }
+    },
+    "Codex": {
+      "node": "NODE_ALPHA",
+      "network_slice": "001",
+      "role": "Code synthesis and repo management",
+      "repo": "sovereign-stack",
+      "entry": "deepflex/agent-lineup.ts",
+      "directive": {
+        "primary_function": "Generate, review, and push code across all repos",
+        "branch": "claude/deepflex-argus-synthesis-jWjmO",
+        "commit_signing": "Ed25519",
+        "no_secrets_in_commits": true
+      }
+    },
+    "SynapZ": {
+      "node": "NODE_ALPHA",
+      "network_slice": "001",
+      "role": "Neural bridge — connects social layer to inference",
+      "repos": ["synapz", "synapz-social"],
+      "directive": {
+        "primary_function": "Bridge community social data to AI inference pipeline",
+        "platform": "ICP-hosted",
+        "algorithm_free": true,
+        "cannot_be_deplatformed": true,
+        "documentary_distribution": "The 458 Frequency (pay-per-view)"
+      }
+    },
+    "Mesh Alpha": {
+      "node": "NODE_BETA",
+      "network_slice": "002",
+      "role": "Primary mesh routing",
+      "repo": "nvq-mesh-fabric",
+      "entry": "mesh.py",
+      "directive": {
+        "primary_function": "Primary path for all inter-node capsule traffic",
+        "failover_to": "Mesh Beta",
+        "sovereign_quant_level": 4,
+        "vram_min_gb": 8
+      }
+    },
+    "Mesh Beta": {
+      "node": "NODE_BETA",
+      "network_slice": "002",
+      "role": "Secondary mesh routing / failover",
+      "repo": "nvq-mesh-fabric",
+      "entry": "mesh.py",
+      "directive": {
+        "primary_function": "Failover and observer for mesh routing",
+        "primary_agent": "Mesh Alpha",
+        "activation": "automatic on Mesh Alpha failure"
+      }
+    },
+    "VR Cockpit Primary": {
+      "node": "NODE_EPSILON",
+      "network_slice": "003",
+      "role": "Primary VR operator interface",
+      "repo": "vr-meeting-room",
+      "entry": "server.py",
+      "port": 7791,
+      "directive": {
+        "primary_function": "Operator control surface for MONAD mesh via VR",
+        "headsets_supported": ["quest3", "index", "vive", "pico4"],
+        "cloudxr_enabled": true,
+        "aframe_fallback": true,
+        "nim_assistant": true
+      }
+    },
+    "VR Cockpit Secondary": {
+      "node": "NODE_EPSILON",
+      "network_slice": "003",
+      "role": "Observer / backup VR interface",
+      "repo": "vr-meeting-room",
+      "entry": "server.py",
+      "directive": {
+        "primary_function": "Read-only observer mode; takes over if Primary fails",
+        "observer_mode": true,
+        "activation": "manual or on Primary failure"
+      }
+    }
+  }
+}
