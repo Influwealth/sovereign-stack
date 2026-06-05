@@ -1,0 +1,102 @@
+{
+  "$schema": "https://sovereign-stack.influwealth.com/schemas/service-registry/v1",
+  "version": "1.0.0",
+  "updated": "2026-06-05",
+  "services": [
+    {
+      "id": "wealthbridge-tradeline-mcp",
+      "repo": "influwealth/wealthbridge-tradeline-mcp",
+      "port": 7710,
+      "base_url": "http://localhost:7710",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["tradeline.score", "tradeline.history", "tradeline.dispute"],
+      "health_endpoint": "/health",
+      "capsule_endpoint": "/capsule/execute",
+      "sap_node_id": "wealthbridge-tradeline-mcp"
+    },
+    {
+      "id": "wealthbridge-tax-stack",
+      "repo": "influwealth/wealthbridge-tax-stack",
+      "port": 7720,
+      "base_url": "http://localhost:7720",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["tax.calculate", "tax.file", "tax.estimate", "tax.pdf"],
+      "health_endpoint": "/health",
+      "capsule_endpoint": "/capsule/execute",
+      "sap_node_id": "wealthbridge-tax-stack"
+    },
+    {
+      "id": "wealthbridge-trade-settlement",
+      "repo": "influwealth/wealthbridge-trade-settlement",
+      "port": 7730,
+      "base_url": "http://localhost:7730",
+      "language": "python",
+      "status": "stub",
+      "capabilities": ["trade.settle", "trade.clear", "trade.confirm"],
+      "health_endpoint": "/health",
+      "capsule_endpoint": "/capsule/execute",
+      "sap_node_id": "wealthbridge-trade-settlement"
+    },
+    {
+      "id": "wealthbridge-data-commons",
+      "repo": "influwealth/wealthbridge-data-commons",
+      "port": 7740,
+      "base_url": "http://localhost:7740",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["data.query", "data.ingest", "data.export"],
+      "health_endpoint": "/health",
+      "capsule_endpoint": "/capsule/execute",
+      "sap_node_id": "wealthbridge-data-commons"
+    },
+    {
+      "id": "argus-prime",
+      "repo": "influwealth/argus-prime",
+      "port": 7700,
+      "base_url": "http://localhost:7700",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["agent.*", "capsule.*", "infra.*", "quantum.*"],
+      "health_endpoint": "/health",
+      "task_endpoint": "/task",
+      "sap_node_id": "argus-prime"
+    },
+    {
+      "id": "qre-agent-platform",
+      "repo": "influwealth/qre-agent-platform",
+      "port": 7750,
+      "base_url": "http://localhost:7750",
+      "language": "motoko+typescript",
+      "runtime": "icp-canister",
+      "status": "active",
+      "capabilities": ["caffeine.predict", "icp.canister", "cbi.insights"],
+      "sap_node_id": "qre-caffeine-agent",
+      "note": "ICP canister — local port is dfx replica proxy"
+    },
+    {
+      "id": "token-gateway",
+      "repo": "influwealth/sovereign-stack",
+      "path": "wealthbridge-os/capsules/token-gateway.ts",
+      "port": 8002,
+      "base_url": "http://localhost:8002",
+      "language": "typescript",
+      "status": "scaffold",
+      "capabilities": ["token.balance", "token.transfer", "token.bridge"],
+      "sap_node_id": "token-gateway"
+    }
+  ],
+  "topology": {
+    "supervisor": {
+      "id": "deepflex-supervisor",
+      "port": 8000,
+      "manages": ["argus-prime", "wealthbridge-tradeline-mcp", "wealthbridge-tax-stack", "wealthbridge-trade-settlement", "wealthbridge-data-commons", "qre-agent-platform"]
+    },
+    "wealthbridge_orchestrator": {
+      "id": "wealthbridge-os",
+      "port": 8001,
+      "manages": ["wealthbridge-tradeline-mcp", "wealthbridge-tax-stack", "wealthbridge-trade-settlement", "wealthbridge-data-commons", "token-gateway"]
+    }
+  }
+}
