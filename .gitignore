@@ -1,29 +1,26 @@
-﻿# Secrets & Environment
-.env
-.env.*
-!.env.example
-
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
+# Binary archives — use external artifact store instead
+WB_Archive_Split.7z.*
+*.7z
+*.7z.*
 
 # Node
 node_modules/
 dist/
-.vite/
-.vite-temp/
+.next/
+*.tsbuildinfo
 
-# OS
-.DS_Store
-Thumbs.db
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
 
-# Keys & Credentials
-*.pem
-*.key
-pqc_keys.json
-*_private_key*
+# Secrets
+.env
+.env.local
+.env.*
+!.env.example
 
-# Build Artifacts / Archives
-WB_Archive_Split.*
+# IDE
+.vscode/
+.idea/
