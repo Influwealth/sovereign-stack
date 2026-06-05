@@ -1,0 +1,136 @@
+openapi: "3.1.0"
+info:
+  title: Token Gateway API
+  version: "1.0.0"
+  description: |
+    Three-tier token system:
+    - Tier 1: In-game tokens (Roblox Lua/TS ledger)
+    - Tier 2: Greenville Coin (ICP canister, USD-pegged stablecoin)
+    - Tier 3: WealthBridge service tokens (capsule execution units)
+
+servers:
+  - url: http://localhost:8002
+    description: Token Gateway Service
+
+components:
+  schemas:
+    TokenBalance:
+      type: object
+      properties:
+        address:
+          type: string
+        tier:
+          type: integer
+          enum: [1, 2, 3]
+        balance:
+          type: number
+        symbol:
+          type: string
+          enum: [EBTK, GVC, WBST]
+        locked:
+          type: number
+
+    TransferRequest:
+      type: object
+      required: [from, to, amount, tier]
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        amount:
+          type: number
+          minimum: 0
+        tier:
+          type: integer
+          enum: [1, 2, 3]
+        memo:
+          type: string
+
+    TransferResponse:
+      type: object
+      properties:
+        tx_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, failed]
+        from:
+          type: string
+        to:
+          type: string
+        amount:
+          type: number
+        tier:
+          type: integer
+
+paths:
+  /balance/{address}:
+    get:
+      summary: Get token balances for address
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tier
+          in: query
+          schema:
+            type: integer
+            enum: [1, 2, 3]
+      responses:
+        "200":
+          description: Token balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenBalance"
+
+  /transfer:
+    post:
+      summary: Transfer tokens between addresses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+      responses:
+        "200":
+          description: Transfer initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransferResponse"
+
+  /bridge/tier1-to-tier2:
+    post:
+      summary: Bridge in-game tokens (Tier 1) to Greenville Coin (Tier 2)
+      description: Converts East Flatbush tokens to GVC at the ICP canister bridge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [player_id, amount]
+              properties:
+                player_id:
+                  type: string
+                amount:
+                  type: number
+                icp_address:
+                  type: string
+      responses:
+        "200":
+          description: Bridge transaction initiated
+
+  /health:
+    get:
+      summary: Token gateway health
+      responses:
+        "200":
+          description: Healthy
