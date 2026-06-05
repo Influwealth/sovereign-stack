@@ -1,0 +1,68 @@
+openapi: "3.1.0"
+info:
+  title: Argus → WealthBridge OS API
+  version: "1.0.0"
+  description: |
+    Contract between Argus Prime (port 7700) and WealthBridge OS sub-services.
+    Argus calls WealthBridge endpoints for financial capsule execution.
+
+servers:
+  - url: http://localhost:7710
+    description: WealthBridge Tradeline MCP
+  - url: http://localhost:7720
+    description: WealthBridge Tax Stack
+  - url: http://localhost:7730
+    description: WealthBridge Trade Settlement
+
+components:
+  schemas:
+    CapsuleRequest:
+      type: object
+      required: [capsule_id, payload]
+      properties:
+        capsule_id:
+          type: string
+        payload:
+          type: object
+        trace_id:
+          type: string
+          format: uuid
+        source_node:
+          type: string
+          default: argus-prime
+    CapsuleResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        capsule_id:
+          type: string
+        output:
+          type: object
+        trace_id:
+          type: string
+
+paths:
+  /capsule/execute:
+    post:
+      summary: Execute a WealthBridge capsule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapsuleRequest"
+      responses:
+        "200":
+          description: Capsule executed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapsuleResponse"
+
+  /health:
+    get:
+      summary: WealthBridge service health
+      responses:
+        "200":
+          description: Healthy
