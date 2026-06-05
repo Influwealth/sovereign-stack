@@ -1,0 +1,94 @@
+openapi: "3.1.0"
+info:
+  title: DeepFlex → WealthBridge OS API
+  version: "1.0.0"
+  description: |
+    Contract between the DeepFlex Supervisor (port 8000) and WealthBridge OS orchestrator.
+    DeepFlex dispatches business automation tasks to WealthBridge.
+
+servers:
+  - url: http://localhost:8001
+    description: WealthBridge OS Orchestrator
+
+components:
+  schemas:
+    OrchestrationRequest:
+      type: object
+      required: [workflow, params]
+      properties:
+        workflow:
+          type: string
+          description: WealthBridge workflow ID
+          enum:
+            - invoice.create
+            - invoice.send
+            - cashflow.analyze
+            - tradeline.score
+            - trade.settle
+            - tax.calculate
+            - client.onboard
+            - financing.apply
+        params:
+          type: object
+        client_id:
+          type: string
+        trace_id:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [standard, youth, underserved, enterprise, edge]
+          default: standard
+
+    OrchestrationResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [queued, running, complete, error]
+        workflow:
+          type: string
+        job_id:
+          type: string
+        result:
+          type: object
+        trace_id:
+          type: string
+
+paths:
+  /orchestrate:
+    post:
+      summary: Submit a WealthBridge workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrchestrationRequest"
+      responses:
+        "200":
+          description: Workflow accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrchestrationResponse"
+
+  /status/{job_id}:
+    get:
+      summary: Poll workflow job status
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job status
+
+  /health:
+    get:
+      summary: WealthBridge OS health
+      responses:
+        "200":
+          description: Healthy
