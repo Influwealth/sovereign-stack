@@ -1,0 +1,158 @@
+openapi: "3.1.0"
+info:
+  title: DeepFlex → Argus API
+  version: "1.0.0"
+  description: |
+    Contract between the DeepFlex Supervisor (port 8000) and Argus Prime (port 7700).
+    All requests carry Sovereign Agent Protocol (SAP) headers for distributed tracing.
+
+servers:
+  - url: http://localhost:7700
+    description: Argus Prime (local)
+
+components:
+  securitySchemes:
+    SAPHeaders:
+      type: apiKey
+      in: header
+      name: x-sap-node-id
+  schemas:
+    TaskRequest:
+      type: object
+      required: [task]
+      properties:
+        task:
+          type: string
+          description: Natural language or structured task string
+        source:
+          type: string
+          default: deepflex-supervisor
+        context:
+          type: object
+          additionalProperties: true
+    TaskResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error, pending]
+        decision:
+          type: object
+        result:
+          description: Capsule or agent output
+        trace_id:
+          type: string
+          format: uuid
+        node_id:
+          type: string
+          default: argus-prime
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+        trace_id:
+          type: string
+
+paths:
+  /health:
+    get:
+      summary: Argus health check
+      responses:
+        "200":
+          description: Node is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  node:
+                    type: string
+                  port:
+                    type: string
+
+  /task:
+    post:
+      summary: Execute a task via ArgusRuntime
+      security:
+        - SAPHeaders: []
+      parameters:
+        - in: header
+          name: x-sap-node-id
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: x-sap-trace-id
+          schema:
+            type: string
+            format: uuid
+        - in: header
+          name: x-sap-version
+          schema:
+            type: string
+            default: "1.0"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        "200":
+          description: Task completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "500":
+          description: Runtime error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /agent:
+    post:
+      summary: Route directly to Argus agent layer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        "200":
+          description: Agent response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+
+  /capsule:
+    post:
+      summary: Route directly to Argus capsule layer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        "200":
+          description: Capsule response
+
+  /deepflex/callback:
+    post:
+      summary: Callback endpoint for DeepFlex instructions push
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Acknowledged
