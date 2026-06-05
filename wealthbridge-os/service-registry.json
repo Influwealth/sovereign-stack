@@ -1,11 +1,114 @@
 {
-  "$schema": "https://sovereign-stack.influwealth.com/schemas/service-registry/v1",
-  "version": "1.0.0",
+  "$schema": "https://sovereign-stack.influwealth.com/schemas/service-registry/v2",
+  "version": "2.0.0",
+  "monad_version": "3.7",
   "updated": "2026-06-05",
+  "monad_nodes": {
+    "NODE_ALPHA": {
+      "role": "Sovereign Control Hub",
+      "service": "deepflex-supervisor",
+      "repo": "sovereign-stack",
+      "port": 8000,
+      "status": "active"
+    },
+    "NODE_BETA": {
+      "role": "Quantum Bridge",
+      "service": "nvq-mesh-fabric",
+      "repos": ["nvq-mesh-fabric", "turboqaunt-core", "qauntum-civilization-qml"],
+      "port": 9400,
+      "status": "stub"
+    },
+    "NODE_GAMMA": {
+      "role": "ICP Integration Gateway",
+      "service": "qre-agent-platform",
+      "repo": "qre-agent-platform",
+      "port": 4943,
+      "status": "active"
+    },
+    "NODE_DELTA": {
+      "role": "NVIDIA 6G Aerial Substrate",
+      "service": "nvidia-resource-suite",
+      "repo": "nvidia-resource-suite",
+      "port": 7760,
+      "monad_port": 38412,
+      "status": "active"
+    },
+    "NODE_EPSILON": {
+      "role": "Digital Twin & VR Interface",
+      "service": "vr-meeting-room",
+      "repos": ["vr-meeting-room", "eastflatbush-90s-unity", "roblox-wealthbridge-east-flatbush"],
+      "port": 7791,
+      "vr_range": "3000-3099",
+      "status": "active"
+    }
+  },
   "services": [
+    {
+      "id": "argus-prime",
+      "repo": "influwealth/argus-prime",
+      "monad_node": "NODE_ALPHA",
+      "port": 7700,
+      "base_url": "http://localhost:7700",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["device_ops", "capsule_execution", "agent_dispatch", "integration_calls", "security_audit"],
+      "health_endpoint": "/health",
+      "task_endpoint": "/task",
+      "sap_node_id": "argus-prime"
+    },
+    {
+      "id": "nvidia-resource-suite",
+      "repo": "influwealth/nvidia-resource-suite",
+      "monad_node": "NODE_DELTA",
+      "port": 7760,
+      "base_url": "http://localhost:7760",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["nim_inference", "nim_embedding", "nim_vision", "omniverse_rendering", "gpu_scheduling", "world_building", "education_tutor"],
+      "health_endpoint": "/health",
+      "sap_node_id": "nvidia-resource-suite"
+    },
+    {
+      "id": "vr-meeting-room",
+      "repo": "influwealth/vr-meeting-room",
+      "monad_node": "NODE_EPSILON",
+      "port": 7791,
+      "base_url": "http://localhost:7791",
+      "language": "python",
+      "status": "active",
+      "capabilities": ["vr_cockpit", "cloudxr_streaming", "digital_twin_render", "meeting_rooms", "nim_assistant"],
+      "health_endpoint": "/health",
+      "sap_node_id": "vr-meeting-room"
+    },
+    {
+      "id": "qre-agent-platform",
+      "repo": "influwealth/qre-agent-platform",
+      "monad_node": "NODE_GAMMA",
+      "port": 4943,
+      "base_url": "http://localhost:4943",
+      "language": "motoko+typescript",
+      "runtime": "icp-canister",
+      "status": "active",
+      "capabilities": ["icp_canister_calls", "identity_vault", "capsule_nft_registry", "token_mint_burn", "data_provenance", "agent_registry", "on_chain_governance"],
+      "health_endpoint": "/health",
+      "sap_node_id": "qre-agent-platform"
+    },
+    {
+      "id": "nvq-mesh-fabric",
+      "repo": "influwealth/nvq-mesh-fabric",
+      "monad_node": "NODE_BETA",
+      "port": 9400,
+      "base_url": "http://localhost:9400",
+      "language": "python",
+      "status": "stub",
+      "capabilities": ["mesh_routing_primary", "mesh_routing_failover", "quantum_bridge", "sovereign_quant_l4"],
+      "health_endpoint": "/health",
+      "sap_node_id": "nvq-mesh-fabric"
+    },
     {
       "id": "wealthbridge-tradeline-mcp",
       "repo": "influwealth/wealthbridge-tradeline-mcp",
+      "monad_node": "NODE_ALPHA",
       "port": 7710,
       "base_url": "http://localhost:7710",
       "language": "python",
@@ -18,10 +121,12 @@
     {
       "id": "wealthbridge-tax-stack",
       "repo": "influwealth/wealthbridge-tax-stack",
+      "monad_node": "NODE_ALPHA",
       "port": 7720,
       "base_url": "http://localhost:7720",
       "language": "python",
       "status": "active",
+      "security_note": "ROTATE ALL SECRETS — see SECURITY.md",
       "capabilities": ["tax.calculate", "tax.file", "tax.estimate", "tax.pdf"],
       "health_endpoint": "/health",
       "capsule_endpoint": "/capsule/execute",
@@ -30,6 +135,7 @@
     {
       "id": "wealthbridge-trade-settlement",
       "repo": "influwealth/wealthbridge-trade-settlement",
+      "monad_node": "NODE_ALPHA",
       "port": 7730,
       "base_url": "http://localhost:7730",
       "language": "python",
@@ -42,6 +148,7 @@
     {
       "id": "wealthbridge-data-commons",
       "repo": "influwealth/wealthbridge-data-commons",
+      "monad_node": "NODE_ALPHA",
       "port": 7740,
       "base_url": "http://localhost:7740",
       "language": "python",
@@ -52,49 +159,41 @@
       "sap_node_id": "wealthbridge-data-commons"
     },
     {
-      "id": "argus-prime",
-      "repo": "influwealth/argus-prime",
-      "port": 7700,
-      "base_url": "http://localhost:7700",
-      "language": "python",
-      "status": "active",
-      "capabilities": ["agent.*", "capsule.*", "infra.*", "quantum.*"],
-      "health_endpoint": "/health",
-      "task_endpoint": "/task",
-      "sap_node_id": "argus-prime"
-    },
-    {
-      "id": "qre-agent-platform",
-      "repo": "influwealth/qre-agent-platform",
-      "port": 7750,
-      "base_url": "http://localhost:7750",
-      "language": "motoko+typescript",
-      "runtime": "icp-canister",
-      "status": "active",
-      "capabilities": ["caffeine.predict", "icp.canister", "cbi.insights"],
-      "sap_node_id": "qre-caffeine-agent",
-      "note": "ICP canister — local port is dfx replica proxy"
-    },
-    {
       "id": "token-gateway",
       "repo": "influwealth/sovereign-stack",
       "path": "wealthbridge-os/capsules/token-gateway.ts",
+      "monad_node": "NODE_ALPHA",
       "port": 8002,
       "base_url": "http://localhost:8002",
       "language": "typescript",
       "status": "scaffold",
       "capabilities": ["token.balance", "token.transfer", "token.bridge"],
       "sap_node_id": "token-gateway"
+    },
+    {
+      "id": "synapz",
+      "repo": "influwealth/synapz",
+      "monad_node": "NODE_ALPHA",
+      "port": 7780,
+      "base_url": "http://localhost:7780",
+      "language": "typescript",
+      "runtime": "icp-hosted",
+      "status": "active",
+      "capabilities": ["social.post", "social.stream", "documentary.distribute", "community.forum"],
+      "note": "ICP-hosted, algorithm-free, cannot be deplatformed",
+      "sap_node_id": "synapz"
     }
   ],
   "topology": {
     "supervisor": {
       "id": "deepflex-supervisor",
+      "node": "NODE_ALPHA",
       "port": 8000,
-      "manages": ["argus-prime", "wealthbridge-tradeline-mcp", "wealthbridge-tax-stack", "wealthbridge-trade-settlement", "wealthbridge-data-commons", "qre-agent-platform"]
+      "manages": ["argus-prime", "nvidia-resource-suite", "vr-meeting-room", "qre-agent-platform", "nvq-mesh-fabric", "wealthbridge-tradeline-mcp", "wealthbridge-tax-stack", "wealthbridge-trade-settlement", "wealthbridge-data-commons", "token-gateway", "synapz"]
     },
     "wealthbridge_orchestrator": {
       "id": "wealthbridge-os",
+      "node": "NODE_ALPHA",
       "port": 8001,
       "manages": ["wealthbridge-tradeline-mcp", "wealthbridge-tax-stack", "wealthbridge-trade-settlement", "wealthbridge-data-commons", "token-gateway"]
     }
